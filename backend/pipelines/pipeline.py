@@ -1,73 +1,92 @@
-from data_loder.data_loder import DataAPI
-from data_exploration.data_exploration import Statistics
-from data_loder.load_local_data import load_local_data
+# pipelines/pipeline.py
 from pathlib import Path
+import pandas as pd
+import logging
 
-BASE_URL = "https://portail-api-data.montpellier3m.fr/ecocounter_timeseries"
+# On importe le nouveau loader consolidé
+# Assure-toi que le dossier s'appelle bien data_loader et pas data_loder (faute de frappe fréquente)
+from backend.data_loder.data_loder import MontpellierAPILoader
+# from src.data_exploration.data_exploration import Statistics (A adapter plus tard)
 
+# Configuration logs
+logging.basicConfig(level=logging.INFO)
 
-dfs = {}
+# Chemins
+BASE_DIR = Path(__file__).parent.parent
+DATA_OUTPUT = BASE_DIR / "data/raw"
 
+def load_api_process():
+    """Lance le téléchargement complet (Metadata + Trafic)"""
+    loader = MontpellierAPILoader()
+    print("\n--- ÉTAPE 1 : COLLECTE API ---")
+    df = loader.run_full_extraction()
+    if df is not None:
+        print("✅ Données collectées et sauvegardées !")
+    else:
+        print("❌ Échec de la collecte.")
 
-def load_api():
-    global dfs
-    api_client = DataAPI()
-    api_client.load_api(BASE_URL)
-    print("API data loaded successfully!")
+def load_local_process():
+    """Charge le fichier consolidé unique"""
+    print("\n--- ÉTAPE 2 : CHARGEMENT LOCAL ---")
+    file_path = DATA_OUTPUT / "trafic_history.csv"
+    
+    if file_path.exists():
+        df = pd.read_csv(file_path)
+        df['date'] = pd.to_datetime(df['date'])
+        print(f"✅ Chargé {len(df)} lignes depuis {file_path.name}")
+        return df
+    else:
+        print("❌ Fichier introuvable. Lancez l'API d'abord.")
+        return None
 
-
-def load_local():
-    global dfs
-    # path relative to pipeline.py
-    folder_path = Path(__file__).parent.parent / "data/output"
-    local_dfs = load_local_data(folder_path)
-    if not local_dfs:
-        print("No CSV files found in the folder!")
+def explore_data_process(df):
+    """Exploration sur le Dataframe unique"""
+    if df is None or df.empty:
+        print("Rien à explorer.")
         return
-    dfs.update(local_dfs)
-    print("Local CSV data loaded successfully!")
 
-
-def explore_data():
-    if not dfs:
-        print("No data found. Load API or local data first.")
-        return
-
-    for name, df in dfs.items():
-        print(f"\n=== STATISTICS FOR {name} ===")
-        stats = Statistics(df)
-        stats.info()
-        stats.describe()
-        stats.isna()
-        stats.duplicated()
-        stats.outliers_rolling()
-
+    print("\n--- ÉTAPE 3 : EXPLORATION RAPIDE ---")
+    print(df.info())
+    print("\n--- Aperçu ---")
+    print(df.head())
+    
+    print("\n--- Statistiques Globales ---")
+    print(df.describe())
+    
+    # Ici, tu pourras réactiver la classe Statistics de ton collègue
+    # Mais attention : elle doit être capable de gérer un DF avec une colonne 'station_id'
+    # stats = Statistics(df) ...
 
 def main():
-    print("\n=== PIPELINE MENU ===")
-    print("1 - Load API")
-    print("2 - Load Local CSVs")
-    print("3 - Explore Data")
-    print("4 - Load API + Explore Data")
-    print("5 - Load Local + Explore Data")
+    while True:
+        print("\n=== 🚲 PIPELINE VELO MONTPELLIER ===")
+        print("1 - Télécharger depuis l'API (Mise à jour CSVs)")
+        print("2 - Charger les CSVs locaux")
+        print("3 - Explorer les données chargées")
+        print("4 - Quitter")
 
-    choice = input("\nEnter your choice (1-5): ")
+        choice = input("\nVotre choix : ")
 
-    if choice == "1":
-        load_api()
-    elif choice == "2":
-        load_local()
-    elif choice == "3":
-        explore_data()
-    elif choice == "4":
-        load_api()
-        explore_data()
-    elif choice == "5":
-        load_local()
-        explore_data()
-    else:
-        print("Invalid option!")
-
+        if choice == "1":
+            load_api_process()
+        
+        elif choice == "2":
+            # On stocke le résultat en mémoire pour l'étape 3
+            current_df = load_local_process()
+            
+        elif choice == "3":
+            if 'current_df' in locals() and current_df is not None:
+                explore_data_process(current_df)
+            else:
+                # Si l'utilisateur a sauté l'étape 2, on tente de charger
+                current_df = load_local_process()
+                explore_data_process(current_df)
+        
+        elif choice == "4":
+            print("Au revoir !")
+            break
+        else:
+            print("Choix invalide.")
 
 if __name__ == "__main__":
     main()
