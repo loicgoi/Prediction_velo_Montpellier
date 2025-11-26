@@ -9,6 +9,7 @@ appnope==0.1.4
 asttokens==3.0.1
 attrs==25.4.0
 bidict==0.23.1
+cattrs==25.3.0
 certifi==2025.11.12
 charset-normalizer==3.4.4
 click==8.3.1
@@ -25,6 +26,7 @@ fastapi==0.121.3
 fastapi-cli==0.0.16
 fastapi-cloud-cli==0.5.1
 fastar==0.6.0
+flatbuffers==25.9.23
 fonttools==4.60.1
 frozenlist==1.8.0
 greenlet==3.2.4
@@ -39,6 +41,7 @@ ipython==9.7.0
 ipython_pygments_lexers==1.1.1
 itsdangerous==2.2.0
 jedi==0.19.2
+jh2==5.0.10
 Jinja2==3.1.6
 joblib==1.5.2
 jupyter_client==8.6.3
@@ -54,7 +57,10 @@ multidict==6.7.0
 narwhals==2.12.0
 nest-asyncio==1.6.0
 nicegui==3.3.1
+niquests==3.15.2
 numpy==2.3.5
+openmeteo_requests==1.7.4
+openmeteo_sdk==1.23.0
 orjson==3.11.4
 packaging==25.0
 pandas==2.3.3
@@ -80,7 +86,10 @@ python-socketio==5.15.0
 pytz==2025.2
 PyYAML==6.0.3
 pyzmq==27.1.0
+qh3==1.5.6
 requests==2.32.5
+requests-cache==1.2.1
+retry-requests==2.0.0
 rich==14.2.0
 rich-toolkit==0.16.0
 rignore==0.7.6
@@ -101,9 +110,12 @@ typer==0.20.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 tzdata==2025.2
+url-normalize==2.2.1
 urllib3==2.5.0
+urllib3-future==2.14.907
 uvicorn==0.38.0
 uvloop==0.22.1
+wassima==2.0.2
 watchfiles==1.1.1
 wcwidth==0.2.14
 websockets==15.0.1
