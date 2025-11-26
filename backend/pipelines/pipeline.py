@@ -2,12 +2,8 @@
 from pathlib import Path
 import pandas as pd
 import logging
-
-# On importe le nouveau loader consolidé
-# Assure-toi que le dossier s'appelle bien data_loader et pas data_loder (faute de frappe fréquente)
 from backend.data_loder.data_loder import MontpellierAPILoader
-# from src.data_exploration.data_exploration import Statistics (A adapter plus tard)
-
+from backend.data_loder.weather_loader import WeatherLoader
 # Configuration logs
 logging.basicConfig(level=logging.INFO)
 
@@ -16,14 +12,16 @@ BASE_DIR = Path(__file__).parent.parent
 DATA_OUTPUT = BASE_DIR / "data/raw"
 
 def load_api_process():
-    """Lance le téléchargement complet (Metadata + Trafic)"""
-    loader = MontpellierAPILoader()
+    """Lance le téléchargement complet (Metadata + Trafic + Météo)"""
+    trafic_loader = MontpellierAPILoader()
+    weather_loader = WeatherLoader()
     print("\n--- ÉTAPE 1 : COLLECTE API ---")
-    df = loader.run_full_extraction()
-    if df is not None:
-        print("✅ Données collectées et sauvegardées !")
+    df_trafic = trafic_loader.run_full_extraction()
+    df_weather = weather_loader.fetch_history(start_date="2023-01-01", end_date="2025-10-31")
+    if df_trafic is not None and df_weather is not None:
+        print("Données collectées et sauvegardées ! ")
     else:
-        print("❌ Échec de la collecte.")
+        print("Échec de la collecte.")
 
 def load_local_process():
     """Charge le fichier consolidé unique"""
@@ -33,10 +31,10 @@ def load_local_process():
     if file_path.exists():
         df = pd.read_csv(file_path)
         df['date'] = pd.to_datetime(df['date'])
-        print(f"✅ Chargé {len(df)} lignes depuis {file_path.name}")
+        print(f" Chargé {len(df)} lignes depuis {file_path.name}")
         return df
     else:
-        print("❌ Fichier introuvable. Lancez l'API d'abord.")
+        print(" Fichier introuvable. Lancez l'API d'abord.")
         return None
 
 def explore_data_process(df):
@@ -52,10 +50,7 @@ def explore_data_process(df):
     
     print("\n--- Statistiques Globales ---")
     print(df.describe())
-    
-    # Ici, tu pourras réactiver la classe Statistics de ton collègue
-    # Mais attention : elle doit être capable de gérer un DF avec une colonne 'station_id'
-    # stats = Statistics(df) ...
+
 
 def main():
     while True:

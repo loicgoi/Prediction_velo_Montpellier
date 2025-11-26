@@ -17,7 +17,7 @@ class MontpellierAPILoader:
     def __init__(self, base_url="https://portail-api-data.montpellier3m.fr"):
         self.base_url = base_url
         self.start_date = "2023-01-01"
-        self.end_date = "2024-12-31"
+        self.end_date = "2025-10-31"
 
     def get_stations_metadata(self, limit=1000):
         """
