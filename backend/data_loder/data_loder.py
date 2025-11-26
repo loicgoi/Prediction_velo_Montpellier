@@ -24,7 +24,7 @@ class MontpellierAPILoader:
         Récupère la liste des compteurs AVEC leurs coordonnées.
         Retourne un DataFrame de métadonnées (Table STATIONS).
         """
-        logger.info("📡 Récupération des métadonnées (IDs + Coordonnées)...")
+        logger.info("Récupération des métadonnées (IDs + Coordonnées)...")
         url = f"{self.base_url}/ecocounter"
         params = {"limit": limit}
         
@@ -60,19 +60,19 @@ class MontpellierAPILoader:
                 
                 stations_list.append(station_data)
                 
-            logger.info(f"✅ {len(stations_list)} stations identifiées.")
+            logger.info(f"{len(stations_list)} stations identifiées.")
             
             # On retourne un DataFrame 'STATIONS'
             return pd.DataFrame(stations_list)
             
         except Exception as e:
-            logger.error(f"❌ Erreur métadonnées : {e}")
+            logger.error(f"Erreur métadonnées : {e}")
             return pd.DataFrame()
 
     def fetch_timeseries(self, station_ids_list):
         """Récupère l'historique de trafic pour une liste d'IDs"""
         all_records = []
-        logger.info(f"🚀 Démarrage récupération trafic pour {len(station_ids_list)} stations...")
+        logger.info(f"Démarrage récupération trafic pour {len(station_ids_list)} stations...")
 
         for i, station_id in enumerate(station_ids_list):
             # Encodage URL
@@ -110,7 +110,7 @@ class MontpellierAPILoader:
         
         # Sauvegarde STATIONS
         df_stations.to_csv(DATA_PATH / "stations_metadata.csv", index=False)
-        logger.info("💾 Fichier stations_metadata.csv sauvegardé.")
+        logger.info("Fichier stations_metadata.csv sauvegardé.")
 
         # 2. Récupérer la table TRAFIC
         # On ne prend que les IDs trouvés à l'étape 1
@@ -121,7 +121,7 @@ class MontpellierAPILoader:
         if not df_trafic.empty:
             df_trafic['date'] = pd.to_datetime(df_trafic['date'])
             df_trafic.to_csv(DATA_PATH / "trafic_history.csv", index=False)
-            logger.info("💾 Fichier trafic_history.csv sauvegardé.")
+            logger.info("Fichier trafic_history.csv sauvegardé.")
             return df_trafic
         
         return None
