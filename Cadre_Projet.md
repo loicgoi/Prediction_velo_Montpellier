@@ -15,8 +15,9 @@ L'objectif est de fournir une interface utilisateur de consultation du trafic cy
 
 ### B. Partie IA
 
-- **Ré-entraînement**: Automatiser l'entraînement du modèle avec les nouvelles données (toutes semaines ? mois ?)
-- **Versioning**: Quel modèle employé ?
+- **Récupération des données**: Gestion quotidienne de récupération des données réelles via l'API MMM et des données météo
+
+- **Prédiction**: A partir du modèle entraîné et des données du jour, faire une prédiction du jour
 
 ### C. Monitoring
 
@@ -31,29 +32,28 @@ L'objectif est de fournir une interface utilisateur de consultation du trafic cy
 ### Arborescence
 
 ```
-mon_projet_velo/
+prediction_velo_montpellier/
 │
-├── data/                   # Données CSV/JSON (ignoré par Git sauf exemples)
-├── models/                 # Vos fichiers .pkl entraînés
+├── main.py                   # Le point de lancement unique
+├── requirements.txt          # Les librairies (pandas, nicegui, scikit-learn...)
 │
-├── src/
-│   ├── main.py             # Point d'entrée (Lancement de NiceGUI)
-│   │
-│   ├── ui/                 # TOUT ce qui concerne l'interface
-│   │   ├── layout.py       # Le header, le menu, le footer
-│   │   ├── pages.py        # La page "Dashboard", la page "Prévision"
-│   │   └── charts.py       # Les fonctions pour dessiner les graphes
-│   │   └── map.py          # Les fonctions pour afficher la map de Montpellier
-│   │
-│   ├── core/               # La logique métier
-│   │   ├── prediction.py   # Fonction qui charge le modèle et prédit
-│   │   ├── database.py     # Gestion de la connexion aux données
-│   │   └── ingestion.py    # Le script de récolte de données via l'API MMM
-│   │
-│   └── theme.py            # Couleurs, CSS personnalisé (Charte graphique)
+├── backend/                  
+│   ├── __init__.py           # Rend le dossier importable
+│   ├── model_service.py      # Charge le .pkl et fait la prédiction
+│   ├── weather_service.py    # Connecteur API Météo
+│   └── data_repository.py    # Connexion BDD / Chargement CSV
 │
-├── requirements.txt
-└── README.md
+├── frontend/                 # NiceGUI
+│   ├── __init__.py
+│   ├── router.py             # Gère la navigation (Menu, liens entre pages)
+│   ├── theme.py              # Vos couleurs, logo, style CSS commun
+│   └── pages/
+│       ├── home_page.py      # Page d'accueil (Dashboard)
+│       └── predict_page.py   # Page de formulaire de prévision
+│
+└── data/                     # Stockage local (ignoré par git pour les gros fichiers)
+    └── models/
+        └── traffic_model_v1.pkl
 ```
 
 ### A. Frontend
@@ -70,7 +70,27 @@ mon_projet_velo/
 
 ### C. Base de données
 
-A déterminer
+SQLite3 ? Supabase ? Azure ?
+
+- Architecture relationnelle à 3 tables
+
+**Table A : stations**
+
+Rôle: Savoir où sont les compteurs et permettre de les afficher sur une carte (optionnel)
+Structure :
+
+```sql
+   station_id VARCHAR(50),
+   name VARCHAR(50),
+   latitude DECIMAL(10,6),
+   longitude DECIMAL(10,6),
+   PRIMARY KEY(station_id)
+
+```
+
+**Table B : meteo**
+
+
 
 ## Diagramme de séquence
 
@@ -116,3 +136,7 @@ sequenceDiagram
 
 
 ```
+
+## Concepts
+
+### 1. 
