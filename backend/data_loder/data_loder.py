@@ -8,7 +8,6 @@ import time
 
 IDS_PATH = Path(__file__).parent
 DATA_PATH = IDS_PATH / "../data"
-IDS_FILE = DATA_PATH / "stations_ids.csv"
 OUTPUT_PATH = DATA_PATH / "output"
 OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
 
@@ -20,7 +19,7 @@ logger.info("Started")
 
 class Loader(ABC):
     @abstractmethod
-    def load_csv(self, file_path):
+    def counter_ids(self, file_path):
         pass
 
     @abstractmethod
@@ -29,13 +28,35 @@ class Loader(ABC):
 
 
 class DataAPI(Loader):
-    def load_csv(self, file_path):
-        """Load station IDs from CSV file."""
-        logger.info("Loading IDs from CSV...")
-        df = pd.read_csv(file_path)
-        self.ids = df.iloc[:, 0].tolist()
-        logger.info(f"Loaded {len(self.ids)} IDs")
-        return self.ids
+    def counter_ids(self, q):
+        """function to fetch ecnocounter endpoint
+        Args:
+            q (int): Limit the number of elements of entities to return (max 1000)
+        Returns:
+            list: list of counter ids
+        """
+        self.q = q
+        try:
+            logger.info("started to fetch ids ...!")
+            url = "https://portail-api-data.montpellier3m.fr/ecocounter"
+            params = {"limit": q}
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            if response.status_code == 200:
+                logger.info("success ..!")
+                data = response.json()
+                logger.info("Raw data has been fetched successfully")
+                self.data_ids = [item["id"] for item in data]
+                self.df_ids = pd.DataFrame(self.data_ids)
+                self.ids = self.df_ids.iloc[:, 0].to_list()
+                logger.info("the list of counter ids has been recoverd successfully")
+                print(self.ids)
+            return self.ids
+        except HTTPError as http_err:
+            logger.info(f"HTTP error occurred {http_err}")
+        except Exception as e:
+            logger.info(f"other error occurred {e}")
+            return None
 
     def fetch_with_retry(self, url, params, retries=3, timeout=10):
         """Helper function to retry failed API calls."""
@@ -58,12 +79,12 @@ class DataAPI(Loader):
         results = {}
 
         params = {
-            "fromDate": "2024-01-01",
-            "toDate": "2024-12-30",
+            "fromDate": "2023-01-01",
+            "toDate": "2025-10-30",
         }
 
         try:
-            for station_id in self.ids:
+            for station_id in self.counter_ids(100):
                 url = f"{base_url}/{station_id}/attrs/intensity"
                 logger.info(f"Fetching data for station {station_id}")
                 response = self.fetch_with_retry(url, params)
