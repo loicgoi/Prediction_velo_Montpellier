@@ -4,8 +4,8 @@ from sqlalchemy import (
     String,
     DateTime,
     Boolean,
-    Float,
     Text,
+    Numeric,
     create_engine,
     ForeignKey,
 )
@@ -29,8 +29,8 @@ class CounterInfo(Base):
 
     id = Column(String(255), primary_key=True)
     name = Column(String(255))
-    longitude = Column(Float(6))
-    latitude = Column(Float(6))
+    longitude = Column(Numeric(9, 6))
+    latitude = Column(Numeric(8, 6))
 
 
 class BikeCount(Base):
