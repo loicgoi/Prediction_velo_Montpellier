@@ -7,6 +7,7 @@ from sqlalchemy import (
     Float,
     Text,
     create_engine,
+    ForeignKey,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
@@ -39,7 +40,9 @@ class BikeCount(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    counter_id = Column(
+        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    )
     intensity = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
 
@@ -51,7 +54,9 @@ class Prediction(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     prediction_date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    counter_id = Column(
+        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    )
     prediction_value = Column(Integer, nullable=False)
     model_version = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
@@ -75,7 +80,9 @@ class ModelMetrics(Base):
     __tablename__ = "model_metrics"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    counter_id = Column(
+        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    )
     date = Column(DateTime, nullable=False, index=True)
     actual_value = Column(Integer)
     predicted_value = Column(Integer)
