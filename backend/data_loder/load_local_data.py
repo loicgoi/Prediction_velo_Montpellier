@@ -4,6 +4,7 @@ from datetime import date
 import pandas as pd
 from backend.data_loder.data_loder import MontpellierAPILoader
 from backend.data_loder.weather_loader import WeatherLoader
+from backend.data_exploration.data_exploration import Statistics
 
 # Configuration du Logger
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -67,14 +68,20 @@ def load_local_data(folder_path=DATA_RAW_DIR):
 
 def explore_data(dfs_dict):
     """
-    Affiche les informations (Ici on garde print car c'est de l'affichage console pour l'utilisateur)
+    Affiche les informations pour chaque DataFrame contenu dans le dictionnaire.
+    Utilise la classe Statistics de data_exploration.py
     """
     if not dfs_dict:
-        logger.warning("Aucune donnée à explorer.")
+        print("Aucune donnee a explorer.")
         return
 
-    print("\n--- RAPPORT D'EXPLORATION ---")
+    print("--- EXPLORATION ---")
+    
     for name, df in dfs_dict.items():
-        print(f"\nFICHIER : {name}")
-        print(df.info())
-        print(df.head())
+        print(f"\n=== JEU DE DONNEES : {name} ===")
+        # Utilisation de la classe issue de data_exploration.py
+        stats = Statistics(df)
+        stats.info()
+        stats.describe()
+        stats.isna()
+        stats.duplicated()
