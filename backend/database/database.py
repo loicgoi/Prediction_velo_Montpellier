@@ -3,11 +3,11 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Boolean,
-    Text,
+    Float,
     Numeric,
     create_engine,
     ForeignKey,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
@@ -31,6 +31,9 @@ class CounterInfo(Base):
     name = Column(String(255))
     longitude = Column(Numeric(9, 6))
     latitude = Column(Numeric(8, 6))
+
+    # Add a unique constraint on the combination of longitude and latitude
+    __table_args__ = (UniqueConstraint("longitude", "latitude", name="_lon_lat_uc"),)
 
 
 class BikeCount(Base):
