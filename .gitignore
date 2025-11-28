@@ -210,3 +210,5 @@ __marimo__/
 .DS_Store
 data/stations_info.json
 data/
+notebooks/
+backend/.cache.sqlite
