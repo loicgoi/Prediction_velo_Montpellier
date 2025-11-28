@@ -75,6 +75,6 @@ def explore_data(dfs_dict):
 
     print("\n--- RAPPORT D'EXPLORATION ---")
     for name, df in dfs_dict.items():
-        print(f"\n📁 FICHIER : {name}")
+        print(f"\nFICHIER : {name}")
         print(df.info())
         print(df.head())

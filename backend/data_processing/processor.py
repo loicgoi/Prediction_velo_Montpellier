@@ -75,7 +75,7 @@ def process_data(dfs_dict):
     output_path = DATA_PROCESSED_DIR / "dataset_final.csv"
     try:
         df_final.to_csv(output_path, index=False)
-        logger.info(f"✅ Traitement terminé. Fichier sauvegardé : {output_path}")
+        logger.info(f"Traitement terminé. Fichier sauvegardé : {output_path}")
         
         # Petit aperçu pour valider
         logger.info(f"Aperçu :\n{df_final.head()}")

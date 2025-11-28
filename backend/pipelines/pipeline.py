@@ -13,9 +13,7 @@ from backend.data_loder.load_local_data import (
     load_local_data, 
     explore_data
 )
-
-# NOUVEL IMPORT : Le processeur dédié
-# (Assure-toi d'avoir créé le dossier backend/data_processing)
+# Import Processing (traitement + fusion)
 from backend.data_processing.processor import process_data
 
 logging.basicConfig(level=logging.INFO)
