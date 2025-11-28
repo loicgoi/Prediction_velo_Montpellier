@@ -27,24 +27,3 @@ class Statistics:
         print(f"Number of duplicated rows: {result}")
         print("----------------------\n")
         return result
-
-    # def outliers_rolling(self, column="value", window=5, std_factor=3):
-    #     """Detect anomalies compared to rolling mean."""
-    #     print(
-    #         f"\n--- Rolling-Window Outliers (column='{column}', window={window}, std_factor={std_factor}) ---"
-    #     )
-    #     rolling_mean = self.df[column].rolling(window).mean()
-    #     rolling_std = self.df[column].rolling(window).std()
-
-    #     upper = rolling_mean + std_factor * rolling_std
-    #     lower = rolling_mean - std_factor * rolling_std
-
-    #     outliers = self.df[(self.df[column] > upper) | (self.df[column] < lower)]
-
-    #     print(f"Found {len(outliers)} outliers:")
-    #     if not outliers.empty:
-    #         print(outliers)
-    #     else:
-    #         print("No outliers found.")
-    #     print("------------------------------------------------------\n")
-    #     return outliers
