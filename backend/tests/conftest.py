@@ -1,23 +1,54 @@
 import pytest
-from sqlalchemy.orm import Session
-from typing import Generator
+from typing import Generator, Any
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
 
-from backend.database.database import DatabaseManager
+from backend.api.api import app as main_app
+from backend.core.dependencies import get_db_session
+from backend.database.database import Base
 
-# Utilise une base de données SQLite en mémoire pour les tests
 TEST_DATABASE_URL = "sqlite:///:memory:"
 
 
 @pytest.fixture(scope="function")
-def db_session() -> Generator[Session, None, None]:
+def db_session() -> Generator[Session, Any, None]:
     """
-    Fixture Pytest partagée pour créer une base de données en mémoire et une session pour chaque test.
-    Assure que chaque test s'exécute sur une base de données propre et isolée.
+    Fixture that creates an isolated in-memory test database for each test.
     """
-    test_db_manager = DatabaseManager(database_url=TEST_DATABASE_URL)
-    test_db_manager.init_db()
-    session = test_db_manager.get_session()
+    engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+
+    # Créer toutes les tables
+    Base.metadata.create_all(bind=engine)
+
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    session = SessionLocal()
 
     yield session
 
     session.close()
+    # Clean up
+    Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture(scope="function")
+def client(db_session: Session) -> Generator[TestClient, Any, None]:
+    """
+    Fixture to create a TestClient that uses the test database.
+    """
+
+    def override_get_db_session():
+        try:
+            yield db_session
+        finally:
+            # Do not close the session here, it is managed by the db_session fixture.
+            pass
+
+    # Replace the dependency to use our test session
+    main_app.dependency_overrides[get_db_session] = override_get_db_session
+
+    with TestClient(main_app) as test_client:
+        yield test_client
+
+    # Clean up overrides
+    main_app.dependency_overrides.clear()

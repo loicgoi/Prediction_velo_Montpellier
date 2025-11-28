@@ -1,5 +1,7 @@
 from datetime import datetime
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
+import pytest, typing
+from sqlalchemy import create_engine
 from sqlalchemy import text
 
 from backend.database.database import (
@@ -8,8 +10,25 @@ from backend.database.database import (
     Weather,
     Prediction,
     ModelMetrics,
+    Base,
 )
 from backend.database.service import DatabaseService
+
+TEST_DATABASE_URL = "sqlite:///:memory:"
+
+
+@pytest.fixture(scope="function")
+def db_session() -> Session:
+    """
+    Fixture dédiée aux tests de service, fournissant une session de DB isolée.
+    """
+    engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+    Base.metadata.create_all(bind=engine)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    session = SessionLocal()
+    yield session
+    session.close()
+    Base.metadata.drop_all(bind=engine)
 
 
 def test_add_counter_infos_success(db_session: Session):

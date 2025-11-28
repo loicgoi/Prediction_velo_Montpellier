@@ -1,11 +1,5 @@
-import logging
 from fastapi import FastAPI
-
 from backend.api.endpoints import router as api_router
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Prévision du Trafic Cyclable Montpellier",

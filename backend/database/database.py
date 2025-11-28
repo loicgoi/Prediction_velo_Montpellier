@@ -13,10 +13,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import os
-import logging
+from utils.logging_config import logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Database
 Base = declarative_base()
@@ -136,6 +134,3 @@ class DatabaseManager:
     def get_session(self):
         """Returns a database session"""
         return self.SessionLocal()
-
-
-db_manager = DatabaseManager()

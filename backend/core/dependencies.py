@@ -1,10 +1,13 @@
-from backend.database.database import db_manager
+from backend.database.database import DatabaseManager
+
+# Creates a single instance of the DatabaseManager for the production application.
+db_manager = DatabaseManager()
 
 
 def get_db_session():
     """
     FastAPI dependency for obtaining a database session.
-    Handles opening and closing the session for each request.
+    This function will be overridden during tests.
     """
     session = db_manager.get_session()
     try:

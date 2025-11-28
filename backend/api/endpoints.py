@@ -1,14 +1,17 @@
-import logging
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from backend.database.service import DatabaseService
 from backend.core.dependencies import get_db_session
 from backend.core.training import run_model_training
-
-logger = logging.getLogger(__name__)
+from utils.logging_config import logger
 
 router = APIRouter()
+
+
+@router.get("/", summary="Vérifier l'état de santé de l'API")
+def health_check():
+    return {"status": "ok"}
 
 
 @router.get("/predict", summary="Récupérer la dernière prédiction pour un compteur")
@@ -24,14 +27,22 @@ def get_prediction(counter_id: str, db: Session = Depends(get_db_session)):
             status_code=404,
             detail=f"Aucune prédiction trouvée pour le compteur {counter_id}",
         )
-    return prediction
+
+    # Convert the SQLAlchemy object to a dict for JSON serialization
+    return {
+        "id": prediction.id,
+        "counter_id": prediction.counter_id,
+        "prediction_date": prediction.prediction_date.isoformat(),
+        "prediction_value": prediction.prediction_value,
+        "model_version": prediction.model_version,
+        "created_at": prediction.created_at.isoformat()
+        if prediction.created_at
+        else None,
+    }
 
 
 @router.post("/train", status_code=202, summary="Lancer un réentraînement du modèle")
 def trigger_training(background_tasks: BackgroundTasks):
-    """
-    Triggers a retraining of the model in the background.
-    """
     logger.info("Requête de réentraînement reçue.")
     background_tasks.add_task(run_model_training)
     return {

@@ -1,5 +1,4 @@
-import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from decimal import Decimal
 from sqlalchemy.exc import SQLAlchemyError
@@ -12,8 +11,7 @@ from .database import (
     Weather,
     ModelMetrics,
 )
-
-logger = logging.getLogger(__name__)
+from utils.logging_config import logger
 
 
 class DatabaseService:
@@ -111,3 +109,21 @@ class DatabaseService:
     def add_model_metrics(self, model_metrics: List[Dict[str, Any]]) -> bool:
         """Add multiples model metrics records to the database"""
         return self._bulk_add(ModelMetrics, model_metrics)
+
+    def get_latest_prediction_for_counter(
+        self, counter_id: str
+    ) -> Optional[Prediction]:
+        """
+        Retrieves the most recent prediction for a given counter.
+        """
+        try:
+            result = (
+                self.session.query(Prediction)
+                .filter(Prediction.counter_id == counter_id)
+                .order_by(Prediction.prediction_date.desc())
+                .first()
+            )
+            return result
+        except SQLAlchemyError as e:
+            logger.error(f"Error fetching prediction for counter {counter_id}: {e}")
+            return None
