@@ -28,7 +28,7 @@ class WeatherHistoryLoader(BaseAPILoader):
         self.longitude = longitude
 
     def fetch_data(
-        self, start_date: str = "2023-01-01", end_date: str = "2025-10-31"
+        self, start_date: str = "2022-12-24", end_date: str = "2025-10-31"
     ) -> Optional[Dict[str, Any]]:
         """
         Fetch historical weather data from Open-Meteo API.
