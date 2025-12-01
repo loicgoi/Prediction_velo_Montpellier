@@ -11,7 +11,7 @@ from .database import (
     Weather,
     ModelMetrics,
 )
-from utils.logging_config import logger
+from backend.utils.logging_config import logger
 
 
 class DatabaseService:

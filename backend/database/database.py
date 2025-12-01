@@ -13,7 +13,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import os
-from utils.logging_config import logger
+from backend.utils.logging_config import logger
 
 
 # Database

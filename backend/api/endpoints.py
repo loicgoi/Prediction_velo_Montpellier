@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from backend.database.service import DatabaseService
 from backend.core.dependencies import get_db_session
 from backend.core.training import run_model_training
-from utils.logging_config import logger
+from backend.utils.logging_config import logger
 
 router = APIRouter()
 
