@@ -3,19 +3,18 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Boolean,
     Float,
-    Text,
+    Numeric,
     create_engine,
+    ForeignKey,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import os
-import logging
+from backend.utils.logging_config import logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Database
 Base = declarative_base()
@@ -28,8 +27,11 @@ class CounterInfo(Base):
 
     id = Column(String(255), primary_key=True)
     name = Column(String(255))
-    longitude = Column(Float(6))
-    latitude = Column(Float(6))
+    longitude = Column(Numeric(9, 6))
+    latitude = Column(Numeric(8, 6))
+
+    # Add a unique constraint on the combination of longitude and latitude
+    __table_args__ = (UniqueConstraint("longitude", "latitude", name="_lon_lat_uc"),)
 
 
 class BikeCount(Base):
@@ -39,7 +41,9 @@ class BikeCount(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    counter_id = Column(
+        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    )
     intensity = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
 
@@ -51,7 +55,9 @@ class Prediction(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     prediction_date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    counter_id = Column(
+        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    )
     prediction_value = Column(Integer, nullable=False)
     model_version = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
@@ -75,7 +81,9 @@ class ModelMetrics(Base):
     __tablename__ = "model_metrics"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    counter_id = Column(
+        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    )
     date = Column(DateTime, nullable=False, index=True)
     actual_value = Column(Integer)
     predicted_value = Column(Integer)
@@ -126,6 +134,3 @@ class DatabaseManager:
     def get_session(self):
         """Returns a database session"""
         return self.SessionLocal()
-
-
-db_manager = DatabaseManager()
