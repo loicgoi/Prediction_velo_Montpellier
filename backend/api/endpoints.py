@@ -4,14 +4,10 @@ from sqlalchemy.orm import Session
 from backend.database.service import DatabaseService
 from backend.core.dependencies import get_db_session
 from backend.core.training import run_model_training
+from backend.pipelines.daily_update import run_daily_update
 from backend.utils.logging_config import logger
 
 router = APIRouter()
-
-
-@router.get("/", summary="Vérifier l'état de santé de l'API")
-def health_check():
-    return {"status": "ok"}
 
 
 @router.get("/predict", summary="Récupérer la dernière prédiction pour un compteur")
@@ -36,7 +32,7 @@ def get_prediction(counter_id: str, db: Session = Depends(get_db_session)):
         "prediction_value": prediction.prediction_value,
         "model_version": prediction.model_version,
         "created_at": prediction.created_at.isoformat()
-        if prediction.created_at
+        if prediction.created_at  # type: ignore
         else None,
     }
 
@@ -48,4 +44,18 @@ def trigger_training(background_tasks: BackgroundTasks):
     return {
         "status": "training_started",
         "message": "Le réentraînement du modèle a été lancé en arrière-plan.",
+    }
+
+
+@router.post(
+    "/update",
+    status_code=202,
+    summary="Lancer la mise à jour quotidienne des données",
+)
+def trigger_daily_update(background_tasks: BackgroundTasks):
+    logger.info("Requête de mise à jour quotidienne des données reçue.")
+    background_tasks.add_task(run_daily_update)
+    return {
+        "status": "daily_update_started",
+        "message": "La mise à jour des données de J-1 a été lancée en arrière-plan.",
     }
