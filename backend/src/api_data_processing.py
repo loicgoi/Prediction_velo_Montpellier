@@ -1,11 +1,9 @@
 import pandas as pd
 from download.trafic_history_api import EcoCounterTimeseriesLoader
 from utils.paths import ARCHIVE_PATH
-from typing import List, Dict
 from typing import List, Dict, Tuple
 
 
-def extract_station_metadata(data: List[Dict]) -> List[str]:
 def extract_station_metadata(data: List[Dict]) -> Tuple[pd.DataFrame, List[str]]:
     """
     Extract station metadata (IDs, latitude, longitude) from raw JSON data
@@ -15,7 +13,6 @@ def extract_station_metadata(data: List[Dict]) -> Tuple[pd.DataFrame, List[str]]
         data (List[Dict]): JSON data from EncountersIDsLoader.
 
     Returns:
-        List[str]: List of station IDs.
         Tuple[pd.DataFrame, List[str]]: A tuple containing the metadata DataFrame and a list of station IDs.
     """
     print("Extracting station metadata...")

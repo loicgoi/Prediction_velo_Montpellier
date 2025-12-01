@@ -5,7 +5,9 @@ from pipelines.pipeline import (
     merge_data,
 )
 from pipelines.pipeline_visualization import create_features_from_csv, visualize_feature
+from core.dependencies import db_manager
 from pipelines.data_insertion import insert_data_to_db
+import pandas as pd
 
 
 def main():
@@ -83,13 +85,29 @@ def main():
 
         elif choice == "6":
             if (
-                df_trafic is not None
+                df_agg is not None
                 and df_weather is not None
                 and df_metadata is not None
             ):
-                insert_data_to_db(df_trafic, df_weather, df_metadata)
+                print("\n--- Étape 6 : Base de données Azure SQL ---")
+
+                print("1. Vérification de la structure des tables...")
+                try:
+                    # Check if tables exists
+                    db_manager.init_db()
+                    print("Structure de la base de données validée (Tables présentes).")
+                except Exception as e:
+                    print(f"Erreur critique lors de la vérification de la DB : {e}")
+                    continue
+
+                # Insert data
+                print("2. Lancement de l'insertion des données...")
+                insert_data_to_db(df_agg, df_weather, df_metadata)
+
             else:
-                print("Data not available. Please fetch data first (step 1).")
+                print(
+                    "Données manquantes. Veuillez lancer les étapes 1, 3 et 4 d'abord."
+                )
 
         elif choice == "7":
             print("Exiting.")

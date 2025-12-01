@@ -1,49 +1,50 @@
 import pandas as pd
-from dotenv import load_dotenv
-
-from database.database import DatabaseManager
 from database.service import DatabaseService
+from sqlalchemy.exc import SQLAlchemyError
+from core.dependencies import db_manager
 from utils.logging_config import logger
 
 
 def insert_data_to_db(
     df_trafic: pd.DataFrame, df_weather: pd.DataFrame, df_metadata: pd.DataFrame
 ):
-    """
-    Connects to the database and inserts data from DataFrames.
-
-    :param df_trafic: DataFrame with bike count data.
-    :param df_weather: DataFrame with weather data.
-    :param df_metadata: DataFrame with counter metadata.
-    """
-    # Load environment variables to get DATABASE_URL
-    load_dotenv()
+    print("[DEBUG] Début de insert_data_to_db...")
 
     # Setup database connection
-    logger.info("Connecting to the database for data insertion...")
-    db_manager = DatabaseManager()
+    logger.info("Obtention d'une session de base de données...")
     session = db_manager.get_session()
 
     try:
         service = DatabaseService(session)
 
-        # Convert DataFrames to list of dictionaries
-        # The service layer expects data in this format.
+        print("[DEBUG] Conversion des DataFrames en dictionnaires...")
         counters_data = df_metadata.to_dict(orient="records")
         counts_data = df_trafic.to_dict(orient="records")
         weather_data = df_weather.to_dict(orient="records")
 
-        # Call service methods to insert data
-        logger.info("Inserting counter metadata...")
+        # Call service methods
+        print(f"[DEBUG] Envoi de {len(counters_data)} compteurs...")
         service.add_counter_infos(counters_data)
 
-        logger.info("Inserting bike counts...")
+        print(f"[DEBUG] Envoi de {len(counts_data)} données de trafic...")
         service.add_bike_counts(counts_data)
 
-        logger.info("Inserting weather data...")
+        print(f"[DEBUG] Envoi de {len(weather_data)} données météo...")
         service.add_weather_data(weather_data)
 
+        print("[DEBUG] Commit de la transaction (enregistrement sur Azure)...")
+        session.commit()
+
+        print("[DEBUG] SUCCÈS TOTAL de l'insertion !")
         logger.info("Data insertion process completed successfully.")
+
+    except SQLAlchemyError as e:
+        print(f"[ERREUR SQL] : {e}")
+        logger.error(f"Une erreur de base de données est survenue: {e}", exc_info=True)
+        session.rollback()
+    except Exception as e:
+        print(f"[ERREUR GÉNÉRALE] : {e}")
+        logger.error(f"Une erreur inattendue est survenue: {e}", exc_info=True)
     finally:
-        # Ensure the session is closed
         session.close()
+        print("[DEBUG] Session fermée.")

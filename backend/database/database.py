@@ -31,7 +31,7 @@ class CounterInfo(Base):
     latitude = Column(Numeric(8, 6))
 
     # Add a unique constraint on the combination of longitude and latitude
-    __table_args__ = (UniqueConstraint("longitude", "latitude", name="_lon_lat_uc"),)
+    # __table_args__ = (UniqueConstraint("longitude", "latitude", name="_lon_lat_uc"),)
 
 
 class BikeCount(Base):
