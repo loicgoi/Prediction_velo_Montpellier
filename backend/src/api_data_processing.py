@@ -114,8 +114,8 @@ def extract_weather_fields(
         {
             "date": dates,
             "avg_temp": avg_temp,
-            "precipitation": precipitation,
-            "max_vent": max_vent,
+            "precipitation_mm": precipitation,
+            "vent_max": max_vent,
         }
     )
 
