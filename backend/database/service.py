@@ -11,7 +11,7 @@ from .database import (
     Weather,
     ModelMetrics,
 )
-from backend.utils.logging_config import logger
+from utils.logging_config import logger
 
 
 class DatabaseService:
@@ -111,7 +111,7 @@ class DatabaseService:
         return self._bulk_add(ModelMetrics, model_metrics)
 
     def get_latest_prediction_for_counter(
-        self, counter_id: str
+        self, station_id: str
     ) -> Optional[Prediction]:
         """
         Retrieves the most recent prediction for a given counter.
@@ -119,11 +119,11 @@ class DatabaseService:
         try:
             result = (
                 self.session.query(Prediction)
-                .filter(Prediction.counter_id == counter_id)
+                .filter(Prediction.station_id == station_id)
                 .order_by(Prediction.prediction_date.desc())
                 .first()
             )
             return result
         except SQLAlchemyError as e:
-            logger.error(f"Error fetching prediction for counter {counter_id}: {e}")
+            logger.error(f"Error fetching prediction for counter {station_id}: {e}")
             return None

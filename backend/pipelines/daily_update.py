@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from backend.pipelines.pipeline import (
+from pipelines.pipeline import (
     fetch_data_for_date,
 )
-from backend.pipelines.data_insertion import insert_data_to_db
-from backend.utils.logging_config import logger
+from pipelines.data_insertion import insert_data_to_db
+from utils.logging_config import logger
 
 
 def run_daily_update():

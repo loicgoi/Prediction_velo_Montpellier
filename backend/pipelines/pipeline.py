@@ -1,14 +1,14 @@
 from datetime import datetime
-from backend.download.ecocounters_ids import EncountersIDsLoader
-from backend.download.weeather_api import WeatherHistoryLoader
-from backend.src.data_exploration import Statistics
-from backend.src.data_cleaner import drop_duplicate, agregate
-from backend.src.api_data_processing import (
+from download.ecocounters_ids import EncountersIDsLoader
+from download.weeather_api import WeatherHistoryLoader
+from src.data_exploration import Statistics
+from src.data_cleaner import drop_duplicate, agregate
+from src.api_data_processing import (
     extract_station_metadata,
     fetch_and_extract_timeseries,
     extract_weather_fields,
 )
-from backend.src.data_merger import (
+from src.data_merger import (
     merge_trafic_with_metadata,
     merge_trafic_with_weather,
 )

@@ -3,8 +3,8 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 from decimal import Decimal
 
-from backend.pipelines.data_insertion import insert_data_to_db
-from backend.database.database import CounterInfo, BikeCount, Weather
+from pipelines.data_insertion import insert_data_to_db
+from database.database import CounterInfo, BikeCount, Weather
 
 
 def test_insert_data_to_db(db_session):
@@ -16,13 +16,13 @@ def test_insert_data_to_db(db_session):
     df_metadata = pd.DataFrame(
         [
             {
-                "id": "counter-1",
+                "station_id": "counter-1",
                 "name": "Counter One",
                 "longitude": "4.835654",
                 "latitude": "45.764043",
             },
             {
-                "id": "counter-2",
+                "station_id": "counter-2",
                 "name": "Counter Two",
                 "longitude": "4.835655",
                 "latitude": "45.764044",
@@ -34,12 +34,12 @@ def test_insert_data_to_db(db_session):
         [
             {
                 "date": datetime(2023, 10, 26, 10, 0, 0),
-                "counter_id": "counter-1",
+                "station_id": "counter-1",
                 "intensity": 150,
             },
             {
                 "date": datetime(2023, 10, 26, 11, 0, 0),
-                "counter_id": "counter-1",
+                "station_id": "counter-1",
                 "intensity": 120,
             },
         ]
@@ -64,7 +64,7 @@ def test_insert_data_to_db(db_session):
     # The 'patch' ensures that any call to DatabaseManager() inside the 'with' block
     # will return our mock_db_manager instead of creating a real one.
     with patch(
-        "backend.pipelines.data_insertion.DatabaseManager", return_value=mock_db_manager
+        "pipelines.data_insertion.DatabaseManager", return_value=mock_db_manager
     ):
         # Act: Call the function to be tested
         insert_data_to_db(df_trafic, df_weather, df_metadata)
@@ -81,11 +81,11 @@ def test_insert_data_to_db(db_session):
     assert len(weather_in_db) == 1
 
     # Check some specific values to be sure
-    assert counters_in_db[0].id == "counter-1"
+    assert counters_in_db[0].station_id == "counter-1"
     assert counters_in_db[0].name == "Counter One"
     assert counters_in_db[0].longitude == Decimal("4.835654")
 
-    assert counts_in_db[0].counter_id == "counter-1"
+    assert counts_in_db[0].station_id == "counter-1"
     assert counts_in_db[0].intensity == 150
 
     assert weather_in_db[0].avg_temp == 15.5

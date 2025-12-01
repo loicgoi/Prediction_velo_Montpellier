@@ -1,33 +1,33 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 
-from backend.database.service import DatabaseService
-from backend.core.dependencies import get_db_session
-from backend.core.training import run_model_training
-from backend.pipelines.daily_update import run_daily_update
-from backend.utils.logging_config import logger
+from database.service import DatabaseService
+from core.dependencies import get_db_session
+from core.training import run_model_training
+from pipelines.daily_update import run_daily_update
+from utils.logging_config import logger
 
 router = APIRouter()
 
 
 @router.get("/predict", summary="Récupérer la dernière prédiction pour un compteur")
-def get_prediction(counter_id: str, db: Session = Depends(get_db_session)):
+def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
     """
     Returns the most recent prediction for a given `counter_id`.
     """
     service = DatabaseService(db)
-    prediction = service.get_latest_prediction_for_counter(counter_id)
+    prediction = service.get_latest_prediction_for_counter(station_id)
 
     if not prediction:
         raise HTTPException(
             status_code=404,
-            detail=f"Aucune prédiction trouvée pour le compteur {counter_id}",
+            detail=f"Aucune prédiction trouvée pour le compteur {station_id}",
         )
 
     # Convert the SQLAlchemy object to a dict for JSON serialization
     return {
         "id": prediction.id,
-        "counter_id": prediction.counter_id,
+        "station_id": prediction.station_id,
         "prediction_date": prediction.prediction_date.isoformat(),
         "prediction_value": prediction.prediction_value,
         "model_version": prediction.model_version,

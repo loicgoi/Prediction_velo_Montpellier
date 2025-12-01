@@ -1,7 +1,7 @@
 import uvicorn
 from dotenv import load_dotenv
 import os
-from backend.utils.logging_config import logger
+from utils.logging_config import logger
 
 # Loading environment variables
 # This is the first thing to do to make DATABASE_URL available everywhere.
@@ -10,7 +10,7 @@ load_dotenv()
 
 # Importing application modules AFTER load_dotenv
 # The order is crucial: we import the modules that depend on .env
-from backend.database.database import DatabaseManager
+from database.database import DatabaseManager
 
 
 def init_database():
@@ -38,4 +38,4 @@ if __name__ == "__main__":
     init_database()
 
     # Start the Uvicorn server, telling it where to find FastAPI's `app` object
-    uvicorn.run("backend.api.api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("api.api:app", host="0.0.0.0", port=8000, reload=True)

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.api.endpoints import router as api_router
+from api.endpoints import router as api_router
 
 app = FastAPI(
     title="Prévision du Trafic Cyclable Montpellier",

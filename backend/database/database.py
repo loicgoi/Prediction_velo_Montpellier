@@ -13,7 +13,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import os
-from backend.utils.logging_config import logger
+from utils.logging_config import logger
 
 
 # Database
@@ -25,7 +25,7 @@ class CounterInfo(Base):
 
     __tablename__ = "counters_info"
 
-    id = Column(String(255), primary_key=True)
+    station_id = Column(String(255), primary_key=True)
     name = Column(String(255))
     longitude = Column(Numeric(9, 6))
     latitude = Column(Numeric(8, 6))
@@ -41,8 +41,8 @@ class BikeCount(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(
-        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
     )
     intensity = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
@@ -55,8 +55,8 @@ class Prediction(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     prediction_date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(
-        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
     )
     prediction_value = Column(Integer, nullable=False)
     model_version = Column(String(100))
@@ -81,8 +81,8 @@ class ModelMetrics(Base):
     __tablename__ = "model_metrics"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    counter_id = Column(
-        String(255), ForeignKey("counters_info.id"), nullable=False, index=True
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
     )
     date = Column(DateTime, nullable=False, index=True)
     actual_value = Column(Integer)

@@ -1,9 +1,9 @@
 import pandas as pd
 from dotenv import load_dotenv
 
-from backend.database.database import DatabaseManager
-from backend.database.service import DatabaseService
-from backend.utils.logging_config import logger
+from database.database import DatabaseManager
+from database.service import DatabaseService
+from utils.logging_config import logger
 
 
 def insert_data_to_db(

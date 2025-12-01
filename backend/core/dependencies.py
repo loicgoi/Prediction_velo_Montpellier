@@ -1,4 +1,4 @@
-from backend.database.database import DatabaseManager
+from database.database import DatabaseManager
 
 # Creates a single instance of the DatabaseManager for the production application.
 db_manager = DatabaseManager()
