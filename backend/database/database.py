@@ -3,19 +3,18 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Boolean,
     Float,
-    Text,
+    Numeric,
     create_engine,
+    ForeignKey,
+    JSON,
 )
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import os
-import logging
+from utils.logging_config import logger
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Database
 Base = declarative_base()
@@ -26,10 +25,13 @@ class CounterInfo(Base):
 
     __tablename__ = "counters_info"
 
-    id = Column(String(255), primary_key=True)
+    station_id = Column(String(255), primary_key=True)
     name = Column(String(255))
-    longitude = Column(Float(6))
-    latitude = Column(Float(6))
+    longitude = Column(Numeric(9, 6))
+    latitude = Column(Numeric(8, 6))
+
+    # Add a unique constraint on the combination of longitude and latitude
+    # __table_args__ = (UniqueConstraint("longitude", "latitude", name="_lon_lat_uc"),)
 
 
 class BikeCount(Base):
@@ -39,7 +41,9 @@ class BikeCount(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
+    )
     intensity = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
 
@@ -51,9 +55,17 @@ class Prediction(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     prediction_date = Column(DateTime, nullable=False, index=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
+    )
     prediction_value = Column(Integer, nullable=False)
     model_version = Column(String(100))
+    training_data = relationship(
+        "FeaturesData",
+        back_populates="prediction",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
     created_at = Column(DateTime, default=datetime.now)
 
 
@@ -75,7 +87,9 @@ class ModelMetrics(Base):
     __tablename__ = "model_metrics"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    counter_id = Column(String(255), nullable=False, index=True)
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
+    )
     date = Column(DateTime, nullable=False, index=True)
     actual_value = Column(Integer)
     predicted_value = Column(Integer)
@@ -83,6 +97,26 @@ class ModelMetrics(Base):
     mean_absolute_error = Column(Float)
     model_version = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
+
+
+class FeaturesData(Base):
+    """Table to store the feature-engineered data used for a prediction."""
+
+    __tablename__ = "features_data"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    prediction_id = Column(
+        Integer, ForeignKey("predictions.id"), nullable=False, unique=True
+    )
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
+    )
+    date = Column(DateTime, nullable=False, index=True)
+    features = Column(JSON, nullable=False)
+    target_intensity = Column(Integer)  # The actual value (your 'intensity' feature)
+    created_at = Column(DateTime, default=datetime.now)
+
+    prediction = relationship("Prediction", back_populates="training_data")
 
 
 class DatabaseManager:
@@ -126,6 +160,3 @@ class DatabaseManager:
     def get_session(self):
         """Returns a database session"""
         return self.SessionLocal()
-
-
-db_manager = DatabaseManager()
