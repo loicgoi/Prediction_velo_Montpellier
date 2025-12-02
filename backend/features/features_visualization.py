@@ -14,7 +14,7 @@ class FeaturesVisualization:
     def __init__(self, df: pd.DataFrame):
         """
         Initialize with dataset.
-        df: DataFrame with columns: station_id, date, intensity, latitude, longitude, avg_temp, precipitation, max_vent
+        df: DataFrame with columns: station_id, date, intensity, latitude, longitude, avg_temp, precipitation, vent_max
         """
         self.df = df.copy()
         self.df["date"] = pd.to_datetime(self.df["date"])
@@ -56,8 +56,8 @@ class FeaturesVisualization:
             bins=[-100, 10, 20, 100],
             labels=["Cold", "Mild", "Hot"],
         )
-        self.df["rainy"] = self.df["precipitation"] > 0
-        self.df["windy"] = self.df["max_vent"] > 15
+        self.df["rainy"] = self.df["precipitation_mm"] > 0
+        self.df["windy"] = self.df["vent_max"] > 15
 
     def _set_custom_yticks(self, ax):
         """
@@ -203,7 +203,7 @@ class FeaturesVisualization:
 
     def plot_correlation_heatmap(self):
         """Plot correlation heatmap"""
-        numeric_cols = ["intensity", "avg_temp", "precipitation", "max_vent"]
+        numeric_cols = ["intensity", "avg_temp", "precipitation_mm", "vent_max"]
         corr = self.df[numeric_cols].corr()
         plt.figure(figsize=(8, 6))
         sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
