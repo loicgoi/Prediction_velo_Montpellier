@@ -1,42 +1,52 @@
 import joblib
 import pandas as pd
-from backend.utils.logging_config import logger 
+import numpy as np
+from pathlib import Path
+from utils.logging_config import logger
+
+# Chemin vers le dossier de sauvegarde du modèle entrainé et scaler
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODELS_PATH = BASE_DIR / "data/models"
 
 class TrafficPredictor:
-    def __init__(self, model_path, preprocessor_path):
-        """Charge le modèle et le préprocesseur."""
+    def __init__(self, model_name="xgboost_v1.pkl", preprocessor_name="preprocessor_v1.pkl"):
+        """
+        Loads the trained model and preprocessor.
+        """
+        self.model_path = MODELS_PATH / model_name
+        self.preprocessor_path = MODELS_PATH / preprocessor_name
+        
         try:
-            self.model = joblib.load(model_path)
-            self.preprocessor = joblib.load(preprocessor_path)
-            logger.info("Modèle et Préprocesseur chargés avec succès.")
+            self.model = joblib.load(self.model_path)
+            self.preprocessor = joblib.load(self.preprocessor_path)
+            logger.info(f"Model and preprocessor loaded from {MODELS_PATH}")
         except Exception as e:
-            logger.error(f"Erreur critique lors du chargement du modèle : {e}")
+            logger.error(f"Failed to load model: {e}")
             self.model = None
             self.preprocessor = None
 
-    def predict_single(self, input_data):
-        """Prévision pour une entrée unique."""
+    def predict_batch(self, df_input: pd.DataFrame) -> pd.DataFrame:
+        """
+        Predicts intensity for a DataFrame of stations (J0).
+        df_input must contain all raw features (cols from DB + Lags).
+        """
         if not self.model or not self.preprocessor:
-            logger.error("Impossible de prédire : Modèle non chargé.")
-            return None
-            
+            logger.error("Model not loaded.")
+            return df_input
+
         try:
-            # Conversion en DataFrame
-            if isinstance(input_data, dict):
-                df = pd.DataFrame([input_data])
-            else:
-                df = input_data
+            # 1. Transform features (Scaling/Encoding) using the pre-fitted preprocessor
+            # We assume df_input has already passed through FeatureEngineering (except lags)
+            X_processed, _ = self.preprocessor.transform(df_input)
             
-            # Transformation
-            X_processed, _ = self.preprocessor.transform(df)
+            # 2. Predict
+            predictions = self.model.predict(X_processed)
             
-            # Prédiction
-            prediction = self.model.predict(X_processed)
-            result = int(prediction[0])
+            # 3. Add result to dataframe
+            # Ensure non-negative predictions
+            df_input['predicted_intensity'] = np.maximum(0, np.round(predictions)).astype(int)
             
-            logger.info(f"Prédiction générée : {result} vélos.")
-            return result
-            
+            return df_input
         except Exception as e:
-            logger.error(f"Erreur lors de la prédiction : {e}")
-            return None
+            logger.error(f"Error during batch prediction: {e}")
+            return df_input
