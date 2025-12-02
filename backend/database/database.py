@@ -7,9 +7,9 @@ from sqlalchemy import (
     Numeric,
     create_engine,
     ForeignKey,
-    UniqueConstraint,
+    JSON,
 )
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import os
@@ -60,6 +60,12 @@ class Prediction(Base):
     )
     prediction_value = Column(Integer, nullable=False)
     model_version = Column(String(100))
+    training_data = relationship(
+        "FeaturesData",
+        back_populates="prediction",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
     created_at = Column(DateTime, default=datetime.now)
 
 
@@ -91,6 +97,26 @@ class ModelMetrics(Base):
     mean_absolute_error = Column(Float)
     model_version = Column(String(100))
     created_at = Column(DateTime, default=datetime.now)
+
+
+class FeaturesData(Base):
+    """Table to store the feature-engineered data used for a prediction."""
+
+    __tablename__ = "features_data"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    prediction_id = Column(
+        Integer, ForeignKey("predictions.id"), nullable=False, unique=True
+    )
+    station_id = Column(
+        String(255), ForeignKey("counters_info.station_id"), nullable=False, index=True
+    )
+    date = Column(DateTime, nullable=False, index=True)
+    features = Column(JSON, nullable=False)
+    target_intensity = Column(Integer)  # The actual value (your 'intensity' feature)
+    created_at = Column(DateTime, default=datetime.now)
+
+    prediction = relationship("Prediction", back_populates="training_data")
 
 
 class DatabaseManager:

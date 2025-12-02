@@ -22,9 +22,9 @@ def run_daily_update():
 
     try:
         # Download data for D-1
-        df_trafic, df_weather, df_metadata = fetch_data_for_date(yesterday)
+        df_agg, df_weather, df_metadata = fetch_data_for_date(yesterday)
 
-        if df_trafic.empty:
+        if df_agg.empty:
             logger.warning(
                 "Aucune nouvelle donnée de trafic trouvée pour hier. Le pipeline s'arrête."
             )
@@ -32,7 +32,7 @@ def run_daily_update():
 
         # Insert the new data into the database
         logger.info("Lancement de l'insertion des nouvelles données...")
-        insert_data_to_db(df_trafic, df_weather, df_metadata)
+        insert_data_to_db(df_agg, df_weather, df_metadata)
 
         logger.info("Pipeline de mise à jour quotidienne terminé avec succès.")
 

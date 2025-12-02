@@ -62,9 +62,9 @@ def test_add_counter_infos_success(db_session: Session):
 
 def test_add_counter_infos_handles_duplicates(db_session: Session):
     """
-    Tests that counters with existing coordinates (lon, lat) are not added.
+    Tests that counters with an existing station_id are not added.
     """
-    # Insert a first counter
+    # Arrange: Insert a first counter
     initial_counter = CounterInfo(
         station_id="initial-01",
         name="Place de la Comédie",
@@ -76,14 +76,14 @@ def test_add_counter_infos_handles_duplicates(db_session: Session):
 
     service = DatabaseService(db_session)
     counters_to_add = [
-        # This counter is a duplicate based on the coordinates.
+        # This counter is a duplicate based on station_id. It should be ignored.
         {
-            "station_id": "duplicate-id",
+            "station_id": "initial-01",
             "name": "Doublon Comédie",
-            "longitude": 3.879,
-            "latitude": 43.608,
+            "longitude": 3.999,  # Different coordinates
+            "latitude": 43.999,
         },
-        # This counter is really new.
+        # This counter is really new. It should be added.
         {
             "station_id": "new-02",
             "name": "Odysseum",
@@ -92,20 +92,21 @@ def test_add_counter_infos_handles_duplicates(db_session: Session):
         },
     ]
 
+    # Act
     success = service.add_counter_infos(counters_to_add)
 
+    # Assert
     assert success is True
 
+    # We started with 1 counter, and should have added only 1 new one ("new-02").
     count = db_session.execute(text("SELECT COUNT(*) FROM counters_info")).scalar_one()
-
     assert count == 2
 
-    new_entry = (
-        db_session.query(CounterInfo).filter_by(station_id="new-02").one_or_none()
+    # Verify that the original counter was not updated
+    original_counter_after = (
+        db_session.query(CounterInfo).filter_by(station_id="initial-01").one()
     )
-
-    assert new_entry is not None
-    assert new_entry.name == "Odysseum"  # type: ignore
+    assert original_counter_after.name == "Place de la Comédie"
 
 
 def test_add_bike_counts_success(db_session: Session):

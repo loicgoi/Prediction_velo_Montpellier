@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Type
 from sqlalchemy.orm import Session
 from decimal import Decimal
 from sqlalchemy.exc import SQLAlchemyError
@@ -24,23 +24,28 @@ class DatabaseService:
     def __init__(self, session: Session):
         self.session = session
 
-    def _bulk_add(self, model: Base, data: List[Dict[str, Any]]):  # type: ignore
+    def _bulk_add(self, model: Type[Base], data: List[Dict[str, Any]]) -> bool:
         """
         Generic method to bulk insert a list of dictionaries into a table.
         """
         if not data:
             logger.info(f"No data provided for model {model.__tablename__}. Skipping.")
-            return
-        self.session.bulk_insert_mappings(model, data)
-        logger.info(f"Prepared {len(data)} records for {model.__tablename__}.")
+            return True
+        try:
+            self.session.bulk_insert_mappings(model, data)
+            logger.info(f"Prepared {len(data)} records for {model.__tablename__}.")
+            return True
+        except SQLAlchemyError as e:
+            logger.error(f"Error during bulk insert for {model.__tablename__}: {e}")
+            return False
 
-    def add_counter_infos(self, counters_data: List[Dict[str, Any]]):
+    def add_counter_infos(self, counters_data: List[Dict[str, Any]]) -> bool:
         """
         Add counters if they do not already exist (based on station_id).
         """
         if not counters_data:
             logger.info("No counter data provided. Skipping.")
-            return
+            return True
 
         # Retrieve all existing IDs in the database
         existing_ids = {
@@ -68,15 +73,16 @@ class DatabaseService:
 
         if not new_counters:
             logger.info("All provided counters already exist.")
-            return
+            return True
 
         # Insertion
         try:
             self.session.bulk_insert_mappings(CounterInfo, new_counters)
             logger.info(f"Successfully inserted {len(new_counters)} new counters.")
+            return True
         except SQLAlchemyError as e:
             logger.error(f"Error bulk inserting counters: {e}")
-            raise e
+            return False
 
     def add_bike_counts(self, counts_data: List[Dict[str, Any]]):
         """Adds multiple bike count records to the database."""
