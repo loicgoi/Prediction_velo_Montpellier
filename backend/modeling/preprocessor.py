@@ -15,7 +15,7 @@ class DataPreprocessor:
             'station_id', 'latitude', 'longitude', 
             'avg_temp', 'precipitation_mm', 'vent_max',
             'day_of_week', 'day_of_year', 'month', 'year',
-            'is_weekend',
+            'is_weekend', 'is_holidays',
             'day_of_week_sin', 'day_of_week_cos', 
             'month_sin', 'month_cos', 
             'is_rainy', 'is_cold', 'is_hot', 'is_windy', 
