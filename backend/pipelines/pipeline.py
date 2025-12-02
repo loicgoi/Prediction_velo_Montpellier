@@ -12,6 +12,8 @@ from src.data_merger import (
     merge_trafic_with_metadata,
     merge_trafic_with_weather,
 )
+from features.features_engineering import FeaturesEngineering
+import pandas as pd
 
 
 def fetch_data_from_apis():
@@ -80,3 +82,22 @@ def merge_data(df_agg, df_metadata, df_weather):
     df_final = merge_trafic_with_weather(df_trafic_coords, df_weather)
     print(f"Data merged. Final shape: {df_final.shape}")
     return df_final
+
+
+def run_features_engineering(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Apply feature engineering to the final merged dataset.
+    Returns the processed dataframe ready for modeling.
+    """
+    if df is None:
+        print("[ERROR] No data provided for feature engineering.")
+        return pd.DataFrame()
+
+    print("[STEP] Running feature engineering...")
+    fe = FeaturesEngineering(df)
+    fe.add_week_month_year().Cycliques().add_weather_featuers().lag().add_holidays_feature().drop_date_column()
+
+    final_df_features = fe.get_data()
+    print("[INFO] Feature engineering completed. Sample:")
+    print(final_df_features.head(2))
+    return final_df_features
