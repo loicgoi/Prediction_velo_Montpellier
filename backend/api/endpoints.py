@@ -21,7 +21,7 @@ def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
     if not prediction:
         raise HTTPException(
             status_code=404,
-            detail=f"Aucune prédiction trouvée pour le compteur {station_id}",
+            detail=f"No predictions found for the counter {station_id}",
         )
 
     # Convert the SQLAlchemy object to a dict for JSON serialization
@@ -39,7 +39,7 @@ def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
 
 @router.post("/train", status_code=202, summary="Lancer un réentraînement du modèle")
 def trigger_training(background_tasks: BackgroundTasks):
-    logger.info("Requête de réentraînement reçue.")
+    logger.info("Request for retraining received.")
     background_tasks.add_task(run_model_training)
     return {
         "status": "training_started",
@@ -53,7 +53,7 @@ def trigger_training(background_tasks: BackgroundTasks):
     summary="Lancer la mise à jour quotidienne des données",
 )
 def trigger_daily_update(background_tasks: BackgroundTasks):
-    logger.info("Requête de mise à jour quotidienne des données reçue.")
+    logger.info("Request for daily data updates received.")
     background_tasks.add_task(run_daily_update)
     return {
         "status": "daily_update_started",
