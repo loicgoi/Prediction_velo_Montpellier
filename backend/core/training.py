@@ -1,5 +1,5 @@
 import time
-from backend.utils.logging_config import logger
+from utils.logging_config import logger
 
 
 def run_model_training():

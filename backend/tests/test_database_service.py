@@ -4,7 +4,7 @@ import pytest, typing
 from sqlalchemy import create_engine
 from sqlalchemy import text
 
-from backend.database.database import (
+from database.database import (
     CounterInfo,
     BikeCount,
     Weather,
@@ -12,7 +12,7 @@ from backend.database.database import (
     ModelMetrics,
     Base,
 )
-from backend.database.service import DatabaseService
+from database.service import DatabaseService
 
 TEST_DATABASE_URL = "sqlite:///:memory:"
 
@@ -38,12 +38,17 @@ def test_add_counter_infos_success(db_session: Session):
     service = DatabaseService(db_session)
     counters_to_add = [
         {
-            "id": "counter-01",
+            "station_id": "counter-01",
             "name": "Albert 1er",
             "longitude": 3.87,
             "latitude": 43.61,
         },
-        {"id": "counter-02", "name": "Lattes", "longitude": 3.90, "latitude": 43.56},
+        {
+            "station_id": "counter-02",
+            "name": "Lattes",
+            "longitude": 3.90,
+            "latitude": 43.56,
+        },
     ]
 
     success = service.add_counter_infos(counters_to_add)
@@ -61,7 +66,10 @@ def test_add_counter_infos_handles_duplicates(db_session: Session):
     """
     # Insert a first counter
     initial_counter = CounterInfo(
-        id="initial-01", name="Place de la Comédie", longitude=3.879, latitude=43.608
+        station_id="initial-01",
+        name="Place de la Comédie",
+        longitude=3.879,
+        latitude=43.608,
     )
     db_session.add(initial_counter)
     db_session.commit()
@@ -70,13 +78,18 @@ def test_add_counter_infos_handles_duplicates(db_session: Session):
     counters_to_add = [
         # This counter is a duplicate based on the coordinates.
         {
-            "id": "duplicate-id",
+            "station_id": "duplicate-id",
             "name": "Doublon Comédie",
             "longitude": 3.879,
             "latitude": 43.608,
         },
         # This counter is really new.
-        {"id": "new-02", "name": "Odysseum", "longitude": 3.91, "latitude": 43.60},
+        {
+            "station_id": "new-02",
+            "name": "Odysseum",
+            "longitude": 3.91,
+            "latitude": 43.60,
+        },
     ]
 
     success = service.add_counter_infos(counters_to_add)
@@ -87,7 +100,9 @@ def test_add_counter_infos_handles_duplicates(db_session: Session):
 
     assert count == 2
 
-    new_entry = db_session.query(CounterInfo).filter_by(id="new-02").one_or_none()
+    new_entry = (
+        db_session.query(CounterInfo).filter_by(station_id="new-02").one_or_none()
+    )
 
     assert new_entry is not None
     assert new_entry.name == "Odysseum"  # type: ignore
@@ -99,12 +114,12 @@ def test_add_bike_counts_success(db_session: Session):
     counts_to_add = [
         {
             "date": datetime.fromisoformat("2023-10-27"),
-            "counter_id": "counter-01",
+            "station_id": "counter-01",
             "intensity": 100,
         },
         {
             "date": datetime.fromisoformat("2023-10-28"),
-            "counter_id": "counter-01",
+            "station_id": "counter-01",
             "intensity": 150,
         },
     ]
@@ -143,7 +158,10 @@ def test_add_predictions_success(db_session: Session):
     """Tests adding prediction data."""
     # A counter must exist for the foreign key constraint
     counter = CounterInfo(
-        id="pred-counter", name="Prediction Counter", longitude=5.0, latitude=45.0
+        station_id="pred-counter",
+        name="Prediction Counter",
+        longitude=5.0,
+        latitude=45.0,
     )
     db_session.add(counter)
     db_session.commit()
@@ -152,7 +170,7 @@ def test_add_predictions_success(db_session: Session):
     predictions_to_add = [
         {
             "prediction_date": datetime.fromisoformat("2024-01-01T10:00:00"),
-            "counter_id": "pred-counter",
+            "station_id": "pred-counter",
             "prediction_value": 200,
             "model_version": "v1.0",
         }
@@ -169,7 +187,10 @@ def test_add_model_metrics_success(db_session: Session):
     """Tests adding model metrics data."""
     # A counter must exist for the foreign key constraint
     counter = CounterInfo(
-        id="metrics-counter", name="Metrics Counter", longitude=6.0, latitude=46.0
+        station_id="metrics-counter",
+        name="Metrics Counter",
+        longitude=6.0,
+        latitude=46.0,
     )
     db_session.add(counter)
     db_session.commit()
@@ -177,7 +198,7 @@ def test_add_model_metrics_success(db_session: Session):
     service = DatabaseService(db_session)
     metrics_to_add = [
         {
-            "counter_id": "metrics-counter",
+            "station_id": "metrics-counter",
             "date": datetime.fromisoformat("2024-01-01T10:00:00"),
             "actual_value": 150,
             "predicted_value": 145,

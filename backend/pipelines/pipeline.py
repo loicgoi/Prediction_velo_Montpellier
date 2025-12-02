@@ -1,3 +1,4 @@
+from datetime import datetime
 from download.ecocounters_ids import EncountersIDsLoader
 from download.weeather_api import WeatherHistoryLoader
 from src.data_exploration import Statistics
@@ -7,7 +8,10 @@ from src.api_data_processing import (
     fetch_and_extract_timeseries,
     extract_weather_fields,
 )
-from src.data_merger import merge_trafic_with_metadata, merge_trafic_with_weather
+from src.data_merger import (
+    merge_trafic_with_metadata,
+    merge_trafic_with_weather,
+)
 
 
 def fetch_data_from_apis():
@@ -20,6 +24,32 @@ def fetch_data_from_apis():
     df_trafic = fetch_and_extract_timeseries(ids)
     df_weather = extract_weather_fields(WeatherHistoryLoader().fetch_data())
     print("Data fetching done.\n")
+    return df_trafic, df_weather, df_metadata
+
+
+def fetch_data_for_date(target_date: datetime):
+    """
+    Download traffic and weather data for a specific date.
+    This function is used by the daily update pipeline.
+    """
+    print(f"Téléchargement des données pour le {target_date.strftime('%Y-%m-%d')}...")
+
+    #  We retrieve the metadata from the counters.
+    df_metadata, ids = extract_station_metadata(EncountersIDsLoader().fetch_data())
+    if not ids:
+        print("No station IDs found.")
+        return None, None, None
+
+    # Formatting the date for APIs
+    date_str = target_date.strftime("%Y-%m-%d")
+
+    df_trafic = fetch_and_extract_timeseries(
+        ids, start_date=date_str, end_date=date_str
+    )
+    df_weather = extract_weather_fields(
+        WeatherHistoryLoader().fetch_data(start_date=date_str, end_date=date_str)
+    )
+
     return df_trafic, df_weather, df_metadata
 
 
