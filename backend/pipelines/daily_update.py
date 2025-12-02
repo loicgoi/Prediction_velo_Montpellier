@@ -14,11 +14,11 @@ def run_daily_update():
     2. Fetches data for that specific date.
     3. Inserts the fetched data into the database.
     """
-    logger.info("--- Démarrage du pipeline de mise à jour quotidienne ---")
+    logger.info("--- Starting the daily update pipeline ---")
 
     # Determine yesterday's date
     yesterday = datetime.now() - timedelta(days=1)
-    logger.info(f"Ciblage des données pour la date : {yesterday.strftime('%Y-%m-%d')}")
+    logger.info(f"Data targeting for the date: {yesterday.strftime('%Y-%m-%d')}")
 
     try:
         # Download data for D-1
@@ -26,18 +26,18 @@ def run_daily_update():
 
         if df_agg.empty:
             logger.warning(
-                "Aucune nouvelle donnée de trafic trouvée pour hier. Le pipeline s'arrête."
+                "No new traffic data found for yesterday. The pipeline stops."
             )
             return
 
         # Insert the new data into the database
-        logger.info("Lancement de l'insertion des nouvelles données...")
+        logger.info("Starting to insert new data...")
         insert_data_to_db(df_agg, df_weather, df_metadata)
 
-        logger.info("Pipeline de mise à jour quotidienne terminé avec succès.")
+        logger.info("Daily update pipeline successfully completed.")
 
     except Exception as e:
         logger.error(
-            f"Une erreur est survenue durant le pipeline de mise à jour : {e}",
+            f"An error occurred during the update pipeline: {e}",
             exc_info=True,
         )

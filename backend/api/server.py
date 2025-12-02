@@ -3,9 +3,8 @@ from dotenv import load_dotenv
 import os
 from utils.logging_config import logger
 
-# Loading environment variables
-# This is the first thing to do to make DATABASE_URL available everywhere.
-logger.info("Chargement des variables d'environnement...")
+
+logger.info("Loading environment variables...")
 load_dotenv()
 
 # Importing application modules AFTER load_dotenv
@@ -22,13 +21,9 @@ def init_database():
         # DatabaseManager will automatically read the URL from the environment variables.
         db_manager = DatabaseManager()
         db_manager.init_db()
-        logger.info(
-            "SUCCÈS : Les tables de la base de données ont été vérifiées/créées."
-        )
+        logger.info("SUCCESS: Database tables have been verified/created.")
     except Exception as e:
-        logger.error(
-            f"ERREUR : Échec de l'initialisation de la base de données. Erreur : {e}"
-        )
+        logger.error(f"ERROR: Database initialization failed. Error: {e}")
         # You can decide to stop the application if the database is essential.
         raise
 
