@@ -10,7 +10,7 @@ current_dir = os.getcwd()
 sys.path.append(os.path.join(current_dir, "backend"))
 
 # Imports du backend
-from database.database import DatabaseManager, BikeCount, CounterInfo
+from backend.database.database import DatabaseManager, BikeCount, CounterInfo
 
 
 def check_tables():
