@@ -95,9 +95,10 @@ def run_features_engineering(df: pd.DataFrame) -> pd.DataFrame:
 
     print("[STEP] Running feature engineering...")
     fe = FeaturesEngineering(df)
-    fe.add_week_month_year().Cycliques().add_weather_featuers().lag().add_holidays_feature().drop_date_column()
+    fe.add_week_month_year().Cycliques().add_weather_featuers().lag().add_holidays_feature().remove_suspect_counters()
 
     final_df_features = fe.get_data()
+    fe.save_to_csv(filename="features_ready_for_training.csv")
     print("[INFO] Feature engineering completed. Sample:")
     print(final_df_features.head(2))
     return final_df_features

@@ -8,12 +8,16 @@ from pipelines.pipeline import (
 from pipelines.pipeline_visualization import create_features_from_csv, visualize_feature
 from core.dependencies import db_manager
 from pipelines.data_insertion import insert_data_to_db
+from pipelines.model_training import train_model_pipeline
 
 
 def main():
     print("=== Modular Pipeline Runner ===\n")
     df_trafic, df_weather, df_metadata = None, None, None
     df_agg, df_final = None, None
+    
+    # Variable pour stocker le résultat du Feature Engineering (Input du modèle)
+    final_df = None 
     fv_instance = None
 
     while True:
@@ -26,9 +30,10 @@ def main():
         print("6 - Feature Visualization")
         print("7 - Insert fetched data into Azure SQL Database")
         print("8 - Run Feature Engineering")
-        print("9 - Quit")
+        print("9 - Train Model (XGBoost)")  
+        print("10 - Quit")                
 
-        choice = input("Enter your choice (1-9): ").strip()
+        choice = input("Enter your choice (1-10): ").strip()
 
         # 1. Fetch Data
         if choice == "1":
@@ -118,20 +123,35 @@ def main():
         # 8. Run Feature Engineering
         elif choice == "8":
             if df_final is not None:
+               
                 final_df = run_features_engineering(df_final)
+                
                 print(
                     f"[INFO] Feature engineering completed. Final dataset shape: {final_df.shape}"
                 )
             else:
                 print("[WARNING] Merged data not available. Run step 4 first.")
 
-        # 9. Quit
+        # 9. Train Model
         elif choice == "9":
+            if final_df is not None:
+                print("[INFO] Starting Model Training Pipeline...")
+                train_model_pipeline(final_df)
+                print("\n" + "="*40)
+                print("Training done successfully !")
+                print("Trained model & processor saved in 'backend/data/models/.")
+                print("="*40+ "\n")
+            else:
+                
+                print("[WARNING] No processed data found. Run step 8 (Feature Engineering) first.")
+
+        # 10. Quit
+        elif choice == "10":
             print("Exiting program. Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please choose a number between 1 and 9.")
+            print("Invalid choice. Please choose a number between 1 and 10.")
 
 
 if __name__ == "__main__":

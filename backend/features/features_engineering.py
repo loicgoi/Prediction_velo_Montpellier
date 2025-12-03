@@ -22,6 +22,44 @@ class FeaturesEngineering:
             "[INFO] FeaturesEngineering initialized with dataframe of shape:",
             self.df.shape,
         )
+        
+        # -----------------------------------------------------------
+    def remove_suspect_counters(self, suspects: list = None) -> "FeaturesEngineering":
+        """
+        Removes rows corresponding to a list of suspect station IDs.
+        
+        Args:
+            suspects (list): List of station_id strings to remove. 
+                             If None, uses a default hardcoded list.
+        
+        Returns:
+            self (FeaturesEngineering): method chaining
+        """
+        print("[STEP] Removing suspect counters...")
+        
+        # Liste par défaut fournie dans ta demande
+        if suspects is None:
+            suspects = [
+                "urn:ngsi-ld:EcoCounter:867228050089043",
+                "urn:ngsi-ld:EcoCounter:867228050089159",
+                "urn:ngsi-ld:EcoCounter:867228050089217",
+                "urn:ngsi-ld:EcoCounter:867228050089787",
+                "urn:ngsi-ld:EcoCounter:867228050092989"
+            ]
+
+        # On compte avant pour le log
+        initial_count = len(self.df)
+        
+        # Le tilde (~) signifie "NOT" en Pandas
+        # On garde tout ce qui N'EST PAS dans la liste des suspects
+        self.df = self.df[~self.df['station_id'].isin(suspects)]
+        
+        removed_count = initial_count - len(self.df)
+        
+        print(f"[INFO] Removed {removed_count} rows from suspect counters.")
+        print(f"[INFO] New dataframe shape: {self.df.shape}")
+        
+        return self
 
     # -----------------------------------------------------------
     def add_week_month_year(self) -> "FeaturesEngineering":
