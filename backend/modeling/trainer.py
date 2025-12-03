@@ -4,8 +4,8 @@ from pathlib import Path
 import numpy as np
 from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-from backend.utils.logging_config import logger 
-from backend.utils.paths import MODELS_PATH
+from utils.logging_config import logger 
+from utils.paths import MODELS_PATH
 
 class ModelTrainer:
     def __init__(self):

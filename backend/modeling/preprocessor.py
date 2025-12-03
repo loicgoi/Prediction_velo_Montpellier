@@ -2,8 +2,8 @@ import pandas as pd
 import joblib
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from backend.utils.logging_config import logger  
-from backend.utils.paths import MODELS_PATH
+from utils.logging_config import logger  
+from utils.paths import MODELS_PATH
 
 class DataPreprocessor:
     def __init__(self):
@@ -15,7 +15,7 @@ class DataPreprocessor:
             'station_id', 'latitude', 'longitude', 
             'avg_temp', 'precipitation_mm', 'vent_max',
             'day_of_week', 'day_of_year', 'month', 'year',
-            'is_weekend', 'is_holidays',
+            'is_weekend', 'is_holiday',
             'day_of_week_sin', 'day_of_week_cos', 
             'month_sin', 'month_cos', 
             'is_rainy', 'is_cold', 'is_hot', 'is_windy', 
