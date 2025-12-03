@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 sys.path.append(os.path.join(os.getcwd(), "backend"))
-from database.database import DatabaseManager, Base
+from backend.database.database import DatabaseManager, Base
 
 print("Reconstruction du schéma de base de données...")
 db = DatabaseManager()
