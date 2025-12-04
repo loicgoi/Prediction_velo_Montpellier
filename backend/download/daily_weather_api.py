@@ -17,7 +17,9 @@ class OpenMeteoDailyAPIC:
         Initialize the API client with cache and retry configuration.
         """
         try:
-            cache_session = requests_cache.CachedSession(".cache", expire_after=3600)
+            cache_session = requests_cache.CachedSession(
+                "../data/cache/.cache", expire_after=3600
+            )
             self.session = retry(cache_session, retries=5, backoff_factor=0.2)
             self.client = openmeteo_requests.Client(session=self.session)
         except Exception as e:
