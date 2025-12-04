@@ -25,7 +25,7 @@ def run_prediction_pipeline():
     4. Run Inference (Prediction).
     5. Save Prediction + Context to DB.
     """
-    logger.info("🚀 Starting Daily Prediction Pipeline (J0)")
+    logger.info("Starting Daily Prediction Pipeline (J0)")
     
     session = db_manager.get_session()
     service = DatabaseService(session)
