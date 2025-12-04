@@ -2,6 +2,7 @@ import pandas as pd
 from download.trafic_history_api import EcoCounterTimeseriesLoader
 from utils.paths import ARCHIVE_PATH
 from typing import List, Dict, Tuple
+from typing import Any
 
 
 def extract_station_metadata(data: List[Dict]) -> Tuple[pd.DataFrame, List[str]]:
@@ -125,3 +126,43 @@ def extract_weather_fields(
     print("Sample of weather data:")
     print(df.head())
     return df
+
+
+def extract_daily_weather(response_json: Any) -> pd.DataFrame:
+    """
+    Convert the JSON response from Open-Meteo API into a Pandas DataFrame.
+
+    Args:
+        response_json (Any): The JSON-like object returned by Open-Meteo API.
+
+    Returns:
+        pd.DataFrame: DataFrame with columns:
+            - date
+            - avg_temp
+            - vent_max
+            - precipitation_mm
+    """
+    # Take first location
+    response = response_json[0]
+
+    # Daily data
+    daily = response.Daily()
+    daily_temperature_2m_mean = daily.Variables(0).ValuesAsNumpy()
+    daily_wind_speed_10m_mean = daily.Variables(1).ValuesAsNumpy()
+    daily_precipitation_sum = daily.Variables(2).ValuesAsNumpy()
+
+    daily_data = {
+        "date": pd.date_range(
+            start=pd.to_datetime(daily.Time(), unit="s", utc=True),
+            end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
+            freq=pd.Timedelta(seconds=daily.Interval()),
+            inclusive="left",
+        )
+    }
+
+    daily_data["avg_temp"] = daily_temperature_2m_mean
+    daily_data["vent_max"] = daily_wind_speed_10m_mean
+    daily_data["precipitation_mm"] = daily_precipitation_sum
+
+    daily_dataframe = pd.DataFrame(data=daily_data)
+    return daily_dataframe
