@@ -211,4 +211,4 @@ __marimo__/
 data/stations_info.json
 data/
 notebooks/
-backend/.cache.sqlite
+*.cache.sqlite

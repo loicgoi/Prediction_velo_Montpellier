@@ -1,17 +1,25 @@
 import pandas as pd
 from utils.paths import OUTPUT_PATH
 from features.features_visualization import FeaturesVisualization
+from utils.logging_config import logger
 
 
 def create_features_from_csv(filename="dataset_final.csv"):
     """
-    Load CSV and return FeaturesVisualization instance.
+    Load CSV file and return FeaturesVisualization instance.
+
+    Args:
+        filename (str): Name of the CSV file in OUTPUT_PATH.
+
+    Returns:
+        FeaturesVisualization instance or None if file not found.
     """
     file_path = OUTPUT_PATH / filename
     try:
         df = pd.read_csv(file_path)
+        logger.info(f"CSV loaded successfully: {file_path}")
     except FileNotFoundError:
-        print(f"File not found: {file_path}")
+        logger.error(f"File not found: {file_path}")
         return None
 
     fv = FeaturesVisualization(df)
@@ -20,11 +28,14 @@ def create_features_from_csv(filename="dataset_final.csv"):
 
 def visualize_feature(fv_instance, user_choice):
     """
-    Show plots based on user input (ID or name).
-    Handles the mapping internally.
+    Show plots based on user input.
+
+    Args:
+        fv_instance (FeaturesVisualization): Instance with loaded data.
+        user_choice (str): Choice of plot, either ID ("1"-"6") or name ("temporal", etc.)
     """
     if fv_instance is None:
-        print("No data available to visualize.")
+        logger.warning("No data available to visualize.")
         return
 
     mapping = {
@@ -51,4 +62,30 @@ def visualize_feature(fv_instance, user_choice):
     elif plot_type == "all":
         fv_instance.show_all_plots()
     else:
-        print(f"Invalid plot choice: {user_choice}")
+        logger.error(f"Invalid plot choice: {user_choice}")
+
+
+def main():
+    """
+    Main function to run feature visualization interactively.
+    """
+    fv_instance = create_features_from_csv()
+
+    if fv_instance is None:
+        logger.error("Cannot proceed without data. Exiting.")
+        return
+
+    print("\nChoose which plot to display:")
+    print("1: Temporal Features")
+    print("2: Weather Features")
+    print("3: Spatial Features")
+    print("4: Station Effect")
+    print("5: Correlation Heatmap")
+    print("6: All Plots")
+    user_choice = input("Enter the number or name of the plot: ").strip().lower()
+
+    visualize_feature(fv_instance, user_choice)
+
+
+if __name__ == "__main__":
+    main()
