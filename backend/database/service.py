@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional, Type
 from sqlalchemy.orm import Session
-from decimal import Decimal
+from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
 from .database import (
@@ -10,6 +10,7 @@ from .database import (
     Prediction,
     Weather,
     ModelMetrics,
+    FeaturesData 
 )
 from utils.logging_config import logger
 
@@ -117,3 +118,59 @@ class DatabaseService:
         except SQLAlchemyError as e:
             logger.error(f"Error fetching prediction for counter {station_id}: {e}")
             return None
+
+    # --- Logique de récupération des données ---
+
+    def get_all_stations(self) -> List[CounterInfo]:
+        """Retrieves all active stations from the database."""
+        return self.session.query(CounterInfo).all()
+
+    def get_weather_for_date(self, target_date: datetime) -> Optional[Weather]:
+        """Retrieves weather forecast/data for a specific date."""
+        # Assuming date is stored at midnight or date-only format in DB
+        return self.session.query(Weather).filter(Weather.date == target_date).first()
+
+    def get_bike_count(self, station_id: str, target_date: datetime) -> Optional[int]:
+        """
+        Retrieves the real intensity for a specific station and date.
+        Used to reconstruct Lags (J-1, J-7) for prediction.
+        """
+        result = (
+            self.session.query(BikeCount.intensity)
+            .filter(BikeCount.station_id == station_id)
+            .filter(BikeCount.date == target_date)
+            .first()
+        )
+        return result[0] if result else None
+
+    def save_prediction_single_with_context(self, pred_data: Dict, features_data: Dict) -> bool:
+        """
+        Saves ONE prediction AND its associated JSON context in a single transaction.
+        Uses .flush() to retrieve the generated prediction ID before creating the context entry.
+        """
+        try:
+            # 1. Create Prediction Object
+            prediction = Prediction(**pred_data)
+            self.session.add(prediction)
+            
+            # 2. Flush: Send to DB to generate prediction.id (transaction remains open)
+            self.session.flush() 
+
+            # 3. Create linked FeaturesData Object
+            features = FeaturesData(
+                prediction_id=prediction.id, # The Foreign Key is now available
+                station_id=pred_data["station_id"],
+                date=pred_data["prediction_date"],
+                features=features_data, # SQLAlchemy automatically handles Dict -> JSON conversion
+                target_intensity=None
+            )
+            self.session.add(features)
+            
+            # 4. Final Commit (Both rows saved together)
+            self.session.commit()
+            return True
+            
+        except SQLAlchemyError as e:
+            self.session.rollback()
+            logger.error(f"Transaction failed for prediction {pred_data.get('station_id')}: {e}")
+            return False
