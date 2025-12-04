@@ -16,36 +16,40 @@ from modeling.predictor import TrafficPredictor
 def run_prediction_pipeline():
     """
     Orchestrates the Daily Prediction Pipeline (J0).
+    
+    Workflow:
     1. Fetch today's weather forecast.
     2. Build the dataset by fetching stations and historical lags from DB.
+       -> Includes a FALLBACK strategy: if Lag-1 (Yesterday) is missing, use Lag-7.
     3. Apply Feature Engineering (Stateless).
     4. Run Inference (Prediction).
     5. Save Prediction + Context to DB.
     """
-    logger.info("Starting Daily Prediction Pipeline (J0)")
+    logger.info("🚀 Starting Daily Prediction Pipeline (J0)")
     
     session = db_manager.get_session()
     service = DatabaseService(session)
-    predictor = TrafficPredictor() # Loads the model
+    predictor = TrafficPredictor() # Loads model and preprocessor
 
     if not predictor.model:
         logger.error("Stop: Model not loaded.")
         return
 
-    # Key Dates
+    # Key Dates setup
+    # We want to predict for TODAY
     today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday = today - timedelta(days=1)
     j_minus_7 = today - timedelta(days=7)
     
     today_str = today.strftime("%Y-%m-%d")
-    logger.info(f"Target Date: {today_str}")
+    logger.info(f"Target Date for prediction: {today_str}")
 
     try:
         # --- STEP 1: WEATHER FORECAST (J0) ---
-        logger.info("1. Fetching Weather Forecast...")
+        logger.info("1. Fetching Weather Forecast for today...")
         weather_client = OpenMeteoDailyAPIC()
         
-        # Ensure variable order matches extraction logic
+        # Variables order MUST match extraction logic
         vars_list = ["temperature_2m_mean", "wind_speed_10m_mean", "precipitation_sum"]
         
         # Coordinates for Montpellier Center
@@ -56,24 +60,35 @@ def run_prediction_pipeline():
             timezone="Europe/Paris"
         )
         
-        # Extract scalar values
+        # Extract scalar values from SDK response
         weather_data = extract_daily_values(responses[0])
-        logger.info(f"Weather for today: {weather_data}")
+        logger.info(f"Weather context: {weather_data}")
 
         # --- STEP 2: BUILD DATASET (Hybrid: DB + Weather) ---
-        logger.info("2. Fetching Stations and Historical Lags from DB...")
+        logger.info("2. Fetching Stations and constructing Lags...")
         stations = service.get_all_stations()
         
         rows = []
         for station in stations:
-            # Manual Lag Retrieval (The Mirror Strategy)
-            lag_1 = service.get_bike_count(station.station_id, yesterday)
-            lag_7 = service.get_bike_count(station.station_id, j_minus_7)
+            # A. Retrieve J-7 (One week ago) - CRITICAL BASELINE
+            val_lag_7 = service.get_bike_count(station.station_id, j_minus_7)
             
-            # Skip if historical data is missing (e.g. new counter or breakdown)
-            if lag_1 is None or lag_7 is None:
+            # If we don't even have last week's data, we skip this station
+            # (Too risky to predict without any history)
+            if val_lag_7 is None:
                 continue
+
+            # B. Retrieve J-1 (Yesterday)
+            val_lag_1 = service.get_bike_count(station.station_id, yesterday)
             
+            # --- FALLBACK STRATEGY ---
+            # If API MMM failed to deliver yesterday's data (latency), we impute with J-7
+            # Assumption: Traffic today is likely similar to traffic same day last week
+            if val_lag_1 is None:
+                # logger.warning(f"Lag-1 missing for {station.station_id}. Using Lag-7 as fallback.")
+                val_lag_1 = val_lag_7
+            
+            # C. Build the row
             row = {
                 "date": today,
                 "station_id": station.station_id,
@@ -84,26 +99,27 @@ def run_prediction_pipeline():
                 "precipitation_mm": weather_data['precipitation_mm'],
                 "vent_max": weather_data['vent_max'],
                 # Injected Lags
-                "lag_1": lag_1,
-                "lag_7": lag_7,
-                "intensity": 0 # Placeholder target
+                "lag_1": val_lag_1,
+                "lag_7": val_lag_7,
+                "intensity": 0 # Placeholder target (unknown)
             }
             rows.append(row)
             
         if not rows:
-            logger.warning("No complete station data found (missing lags).")
+            logger.warning("No complete station data found (even with fallback). Check DB population.")
             return
 
         df_input = pd.DataFrame(rows)
         logger.info(f"Raw dataset ready: {len(df_input)} rows.")
 
         # --- STEP 3: FEATURE ENGINEERING ---
+        # We reuse the existing class logic but SKIP .lag() method
         fe = FeaturesEngineering(df_input)
         fe.add_week_month_year() \
           .Cycliques() \
           .add_weather_featuers() \
           .add_holidays_feature()
-          # .lag() -> NE PAS DECOMMENTER
+          # .lag() -> DO NOT CALL HERE (columns already exist)
         
         df_ready = fe.get_data()
 
@@ -122,17 +138,18 @@ def run_prediction_pipeline():
                     "model_version": "xgboost_v1"
                 }
                 
-                # Prepare Context JSON
-                # Remove technical columns to keep JSON clean
+                # Prepare Context JSON (for MLOps lineage)
+                # Drop technical columns to keep JSON clean
                 cols_drop = ['predicted_intensity', 'date', 'station_id', 'intensity']
                 features_dict = row.drop(cols_drop, errors='ignore').to_dict()
                 
-                # Convert timestamps to string for JSON serialization
+                # Convert timestamps/numpy types to native python types for JSON serialization
                 features_clean = {
                     k: str(v) if isinstance(v, (pd.Timestamp, datetime)) else v 
                     for k, v in features_dict.items()
                 }
                 
+                # Transactional save
                 if service.save_prediction_single_with_context(pred_data, features_clean):
                     count += 1
             

@@ -1,125 +1,114 @@
-# Documentation : Pipeline de Prédiction Quotidienne (J0)
+# Documentation Technique : Pipeline de Prediction J0
 
-## Objectif
+## 1. Fonctionnement General & Sequence
 
-Ce document décrit la logique derrière la prédiction quotidienne
-Il s'agit du processus automatique qui aura lieu tous les jours à une heure déterminée (7h ?).
+Ce pipeline a pour but de predire le trafic cyclable de la journee en cours (J0) pour l'ensemble des stations.
+C'est un processus de type Batch (traitement par lot) concu pour etre execute chaque matin.
 
-**Recueillir les données de la veille (J-1).**
+**La logique "Miroir"**
 
-**Prédire le trafic cyclable de la journée en cours (J0).**
+Contrairement a l'entrainement ou l'on dispose d'un historique continu, la prediction a J0 necessite de reconstruire artificiellement une ligne de donnees pour chaque station en assemblant des informations eparses :
 
-**Historiser le contexte de décision (Météo + Passé) pour le monitoring.**
+**Le Futur (Meteo) :** On recupere les previsions pour aujourd'hui.
 
-## Le Flux Séquentiel
+**Le Passe (Lags) :** On interroge la base de donnees pour retrouver les valeurs d'hier (J-1) et de la semaine derniere (J-7).
 
-Le processus est orchestré en 4 étapes critiques qui doivent s'exécuter dans l'ordre strict.
+### Diagramme de Sequence
 
-### Étape 1 : Mise à jour du Passé (J-1)
-
-Action : Le script interroge l'API Montpellier pour récupérer les comptages réels de la veille.
-
-Pourquoi ? C'est indispensable pour calculer le Lag-1 (trafic d'hier) qui est l'une des variables les plus importantes pour prédire aujourd'hui.
-
-Stockage : Les données sont nettoyées et insérées dans la table TRAFIC (Base de données).
-
-### Étape 2 : Récupération du Contexte (J0)
-
-Nous devons construire une ligne de données "hybride" pour chaque station, composée d'éléments hétérogènes :
-
-Qui ? Liste des stations actives (Source : BDD STATIONS).
-
-Quel temps ? Prévisions météo pour aujourd'hui (Source : API OpenMeteo Forecast). La même météo est appliquée à toutes les stations.
-
-Quel passé ? C'est le point clé.
-
-Le script interroge la BDD pour trouver le trafic exact de la station à J-1 (val_lag_1).
-
-Le script interroge la BDD pour trouver le trafic exact de la station à J-7 (val_lag_7).
-
-Note : Si une station n'a pas d'historique (pas de Lag-1 ou Lag-7), elle est exclue de la prédiction pour garantir la qualité.
-
-## Étape 3 : Feature Engineering "Stateless"
-
-À ce stade, nous avons un DataFrame brut. Nous appliquons les transformations mathématiques pour le rendre compréhensible par le modèle.
-
-Temporel : Extraction du jour de la semaine, mois, année.
-
-Cyclique : Calcul des Sinus/Cosinus pour le mois et le jour.
-
-Météo : Création des seuils binaires (is_rainy, is_cold).
-
- Important : Nous n'utilisons PAS la méthode de décalage automatique (shift()) ici, car les colonnes lag_1 et lag_7 ont déjà été remplies manuellement à l'étape précédente.
-
-## Étape 4 : Inférence & Sauvegarde
-
-Prédiction : Le modèle (XGBoost) reçoit la matrice de données et prédit l'intensité pour les 65 stations d'un coup (Batch).
-
-Traçabilité  :  Le résultat est stocké dans la table PREDICTIONS.
-
-Le contexte complet (Météo + Lags utilisés) est converti en JSON et stocké dans la colonne dédiée. Cela permet de comprendre a posteriori pourquoi le modèle a pris telle décision.
-
-## Schéma d'Architecture (Séquence)
+Ce schema illustre les interactions entre l'orchestrateur et les differents modules.
 
 ```mermaid
 
 sequenceDiagram
     autonumber
-    participant Orch as Orchestrateur
-    participant API_M3M as API Montpellier
-    participant API_Weather as API Meteo
-    participant DB as Base de Donnees
-    participant Feature as Feature Engineer
-    participant Model as Modele IA
+    participant Orchestrator as daily_prediction.py
+    participant API_Weather as API Météo (Daily)
+    participant DB as Database Service
+    participant FeatureEng as Feature Engineering
+    participant Predictor as Traffic Predictor
 
-    Note over Orch: DEBUT DU BATCH (06:00)
+    Note over Orchestrator: Démarrage du Batch J0
 
-    %% Etape 1
-    rect
-        Note right of Orch: 1. Mise à jour J-1
-        Orch->>API_M3M: GET Trafic Hier (J-1)
-        API_M3M-->>Orch: Donnees reelles
-        Orch->>DB: INSERT into TRAFIC
-    end
+    %% Étape 1 : Météo
+    Orchestrator->>API_Weather: Récupérer Forecast (J0)
+    API_Weather-->>Orchestrator: Température, Pluie, Vent
 
-    %% Etape 2
-    rect
-        Note right of Orch: 2. Construction Contexte J0
-        Orch->>API_Weather: GET Forecast Aujourd'hui
-        Orch->>DB: SELECT All Stations
+    %% Étape 2 : Construction du Dataset
+    Orchestrator->>DB: Récupérer liste des stations
+    
+    loop Pour chaque station
+        Orchestrator->>DB: Get Trafic J-1 (Lag 1)
+        Orchestrator->>DB: Get Trafic J-7 (Lag 7)
         
-        loop Pour chaque Station
-            Orch->>DB: GET Valeur J-1 (Lag 1)
-            Orch->>DB: GET Valeur J-7 (Lag 7)
-            Orch->>Orch: Assemblage Ligne (Station + Meteo + Lags)
+        alt Donnée J-1 manquante ?
+            Orchestrator->>Orchestrator: Fallback : utiliser J-7
         end
-    end
-
-    %% Etape 3
-    rect
-        Note right of Orch: 3. Transformation
-        Orch->>Feature: Apply Transformations (Dates, Meteo...)
-        Feature-->>Orch: DataFrame pret (Matrice X)
-    end
-
-    %% Etape 4
-    rect
-        Note right of Orch: 4. Prediction & Trace
-        Orch->>Model: Predict Batch (X)
-        Model-->>Orch: Predictions Y
         
-        Orch->>Orch: Conversion Features -> JSON
-        Orch->>DB: INSERT into PREDICTIONS (Valeur + JSON Context)
+        Orchestrator->>Orchestrator: Assemblage ligne (Station + Météo + Lags)
     end
 
-    Note over Orch: FIN DU BATCH
+    %% Étape 3 : Transformation
+    Orchestrator->>FeatureEng: Calculer Features (Dates, Seuils météo)
+    Note right of FeatureEng: Aucun shift() • Lags déjà injectés
+    FeatureEng-->>Orchestrator: DataFrame prêt
+
+    %% Étape 4 : Prédiction
+    Orchestrator->>Predictor: Predict Batch
+    Predictor-->>Orchestrator: Valeurs prédites
+
+    %% Étape 5 : Sauvegarde
+    loop Pour chaque résultat
+        Orchestrator->>Orchestrator: Convertir contexte en JSON
+        Orchestrator->>DB: Sauvegarder (Prédiction + JSON)
+    end
 
 ```
 
-## Points d'attention pour les développeurs
 
-Pas de shift() : Ne jamais réutiliser la logique d'entraînement qui fait des shift() temporels. En production, le passé est une requête SQL, pas une ligne précédente dans un DataFrame.
+## 2. Description des Fichiers Impliques
 
-Gestion des Trous : Si l'API Montpellier a échoué hier, le Lag-1 sera manquant aujourd'hui. Le script est conçu pour ignorer (skip) ces stations temporairement plutôt que de prédire n'importe quoi.
+**Nouveaux Fichiers (Crees pour cette feature)**
 
-Format JSON : La colonne features_data est votre meilleure amie pour le débogage. Si une prédiction semble fausse, vérifiez toujours ce JSON avant d'accuser le modèle.
+| Fichier                 | Emplacement        | Rôle                                                                     |
+| ----------------------- | ------------------ | ------------------------------------------------------------------------ |
+| **daily_prediction.py** | backend/pipelines/ | Orchestrateur. Coordonne API, BDD, feature engineering et modèle.        |
+| **predictor.py**        | backend/modeling/  | Moteur d’inférence chargé du modèle `.pkl` et du batch processing.       |
+| **weather_utils.py**    | backend/pipelines/ | Extraction et nettoyage des valeurs météo quotidiennes du SDK OpenMeteo. |
+
+**Fichiers modifiés**
+
+| Fichier                     | Emplacement       | Utilité                                       |
+| --------------------------- | ----------------- | --------------------------------------------- |
+| **daily_weather_api.py**    | backend/download/ | Récupération de la météo du jour.             |
+| **features_engineering.py** | backend/features/ | Transformation dates et météo.                |
+| **service.py**              | backend/database/ | Lecture des lags et écriture des prédictions. |
+
+
+## 3. Modifications apportees aux Fichiers Preexistants
+
+Pour permettre le bon fonctionnement du pipeline, le fichier backend/database/service.py a du evoluer :
+
+**Ajout de methodes de Lecture (GET) :**
+
+get_all_stations() : Pour savoir sur qui predire.
+
+get_bike_count(station_id, date) : Pour aller chercher chirurgicalement la valeur du passe necessaire aux Lags.
+
+**Ajout d'une methode d'Ecriture Transactionnelle (POST) :**
+
+save_prediction_single_with_context(...) : Cette methode sauvegarde la prediction ET son contexte JSON en une seule transaction atomique. Elle utilise un .flush() pour garantir que le lien (Cle Etrangere) entre la prediction et ses features est correct.
+
+Le fichier backend/main.py a egalement ete modifie pour ajouter l'option 10 au menu principal.
+
+## 4. Guide de Demarrage
+
+**Prerequis Techniques**
+
+*Avant de lancer la prediction J0, le systeme doit etre dans l'etat suivant :*
+
+Base de donnees initialisee : Les tables doivent exister.
+
+Donnees presentes : La table bike_count doit contenir des donnees pour J-1 et J-7. Si la base est vide, le pipeline s'arretera (securite).
+
+Modeles entraines : Les fichiers xgboost_v1.pkl et preprocessor_v1.pkl doivent etre presents dans backend/data/models/.
+
