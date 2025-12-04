@@ -4,6 +4,7 @@ from retry_requests import retry
 from utils.logging_config import logger
 from download.abstract_loader import BaseAPILoader
 from typing import Optional, Dict, Any
+from utils.paths import CACHE_PATH
 
 
 class WeatherHistoryLoader(BaseAPILoader):
@@ -20,7 +21,9 @@ class WeatherHistoryLoader(BaseAPILoader):
             latitude (float): Latitude of the location.
             longitude (float): Longitude of the location.
         """
-        cache_session = requests_cache.CachedSession(".cache", expire_after=-1)
+        cache_session = requests_cache.CachedSession(
+            CACHE_PATH / ".cache", expire_after=-1
+        )
         retry_session = retry(cache_session, retries=5, backoff_factor=0.3)
         self.session = retry_session
         self.url = "https://archive-api.open-meteo.com/v1/archive"
