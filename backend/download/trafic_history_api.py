@@ -19,19 +19,16 @@ class EcoCounterTimeseriesLoader(BaseAPILoader):
     def _generate_date_chunks(self, start_str: str, end_str: str, months: int = 6) -> List[Tuple[str, str]]:
         """
         Helper method to split a date range into smaller chunks (e.g., 6 months).
-        This helps avoid hitting the 10k records limit of the API per request.
-
-        Args:
-            start_str (str): Start date string.
-            end_str (str): End date string.
-            months (int): Size of the chunk in months.
-
-        Returns:
-            List[Tuple[str, str]]: List of (start, end) date strings for each chunk.
         """
         start = pd.to_datetime(start_str)
         end = pd.to_datetime(end_str)
         chunks = []
+        # If the range is a single day (or instantaneous), return one chunk immediately
+        if start == end:
+            return [(
+                start.strftime("%Y-%m-%dT%H:%M:%S"),
+                end.strftime("%Y-%m-%dT%H:%M:%S")
+            )]
         
         current = start
         while current < end:
@@ -58,17 +55,6 @@ class EcoCounterTimeseriesLoader(BaseAPILoader):
     ) -> Dict[str, Optional[Dict]]:
         """
         Loop over station IDs AND date chunks to fetch complete JSON data with retry mechanism.
-
-        Args:
-            station_ids_list (List[str]): List of station IDs to fetch data for.
-            start_date (str): Start date in YYYY-MM-DD format.
-            end_date (str): End date in YYYY-MM-DD format.
-            timeout (int): Timeout in seconds for each request.
-            retries (int): Number of retry attempts in case of failure.
-
-        Returns:
-            Dict[str, Optional[Dict]]: Dictionary mapping station_id to CONSOLIDATED response JSON,
-                                       or None if fetching failed.
         """
         results: Dict[str, Optional[Dict]] = {}
         total_stations = len(station_ids_list)
