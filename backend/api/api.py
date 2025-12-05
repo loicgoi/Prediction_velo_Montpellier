@@ -1,13 +1,34 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from api.endpoints import router as api_router
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import make_asgi_app  # Corrected to use ASGI app
 from starlette.middleware.base import BaseHTTPMiddleware
+from core.scheduler import start_scheduler, shutdown_scheduler
+from utils.logging_config import logger
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    FastAPI application lifecycle.
+    Manages what happens at startup and shutdown.
+    """
+    logger.info("Starting the FastAPI application...")
+    start_scheduler()
+
+    yield
+
+    logger.info("Shutting down the FastAPI application...")
+    shutdown_scheduler()
+
+
+# Creating the application with the lifecycle
 app = FastAPI(
     title="Prévision du Trafic Cyclable Montpellier",
     description="API pour fournir des prédictions de trafic et gérer les modèles.",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Configuration du CORS pour autoriser les requêtes du frontend
