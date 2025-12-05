@@ -141,3 +141,91 @@ Assure la fiabilité du système via des tests automatiques et un calcul quotidi
 Les performances du modèle sont stockées quotidiennement dans la table model_metrics.
 
 **Ré-entraînement** : Le pipeline model_training.py peut être lancé (via main.py) pour mettre à jour le modèle avec les dernières données, incluant les nouveaux compteurs installés.
+
+## Modèle C4
+
+### 1. Diagramme de Contexte
+
+```mermaid
+C4Context
+    title Diagramme de Contexte - Système de Prévision Vélo
+
+    Person(user, "Utilisateur Final", "Urbaniste ou Citoyen de Montpellier")
+    
+    System(system, "Application Prévision Vélo", "Permet de visualiser l'historique et les prédictions de trafic cyclable.")
+
+    System_Ext(api_mmm, "API Open Data Montpellier", "Fournit les comptages réels (J-1)")
+    System_Ext(api_meteo, "API OpenMeteo", "Fournit l'historique et les prévisions météo (J0)")
+
+    Rel(user, system, "Consulte les dashboards", "HTTPS")
+    Rel(system, api_mmm, "Récupère les données trafic", "JSON/HTTPS")
+    Rel(system, api_meteo, "Récupère la météo", "JSON/HTTPS")
+```
+
+### 2. Diagramme de Conteneur
+
+```mermaid
+C4Container
+    title Diagramme de Conteneurs - Architecture Docker/Azure
+
+    Person(user, "Utilisateur", "Navigateur Web")
+
+    Container_Boundary(azure, "Azure Cloud") {
+        
+        Container(frontend, "Frontend", "Python, NiceGUI", "Interface utilisateur interactive pour la visualisation.")
+        
+        Container(backend, "Backend API & Worker", "Python, FastAPI", "Gère l'ETL, l'entraînement du modèle et l'exposition des données.")
+        
+        ContainerDb(database, "Base de Données", "Azure SQL Database", "Stocke l'historique, les métadonnées et les prédictions.")
+        
+        Container(storage, "Stockage Local / Volume", "Système de Fichiers", "Stocke les modèles entraînés (.pkl) et les CSV temporaires.")
+    }
+
+    System_Ext(apis, "APIs Externes", "Montpellier & Météo")
+
+    Rel(user, frontend, "Visite", "HTTPS")
+    Rel(frontend, backend, "Requête les données", "HTTP/JSON")
+    
+    Rel(backend, database, "Lit/Ecrit les données", "SQL/SQLAlchemy")
+    Rel(backend, storage, "Charge/Sauvegarde les modèles", "File System")
+    Rel(backend, apis, "Télécharge les données", "HTTPS")
+```
+
+### Diagramme de Composants
+
+```mermaid
+C4Component
+    title Diagramme de Composants - Backend Python
+
+    Container_Boundary(backend, "Backend Application") {
+        
+        Component(orchestrator, "Pipelines Orchestrator", "daily_prediction.py, daily_update.py", "Coordonne les tâches planifiées (CRON).")
+        
+        Component(loader, "Data Loaders", "download/*", "Gère la connexion et la pagination avec les APIs externes.")
+        
+        Component(feature_eng, "Feature Engineer", "features_engineering.py", "Transforme les données brutes en vecteurs (Lags, Sinus, Météo).")
+        
+        Component(predictor, "ML Predictor", "modeling/predictor.py", "Charge le modèle XGBoost et effectue l'inférence.")
+        
+        Component(trainer, "ML Trainer", "modeling/trainer.py", "Entraîne et sauvegarde le modèle (Optionnel en prod).")
+        
+        Component(db_service, "Database Service", "database/service.py", "Abstraction CRUD pour parler à la BDD.")
+        
+        Component(api_routes, "API Endpoints", "api/endpoints.py", "Expose les résultats au Frontend.")
+    }
+
+    ContainerDb(db, "Database", "SQL Server")
+    System_Ext(ext_api, "External APIs")
+
+    Rel(orchestrator, loader, "Déclenche la collecte")
+    Rel(loader, ext_api, "Requête")
+    
+    Rel(orchestrator, db_service, "Sauvegarde/Lit l'historique")
+    Rel(db_service, db, "SQL Query")
+    
+    Rel(orchestrator, feature_eng, "Transforme les données")
+    Rel(orchestrator, predictor, "Demande une prédiction")
+    
+    Rel(predictor, feature_eng, "Utilise pour le preprocessing")
+    Rel(api_routes, db_service, "Lit les résultats finaux")
+```
