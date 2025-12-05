@@ -45,7 +45,7 @@ def extract_station_metadata(data: List[Dict]) -> Tuple[pd.DataFrame, List[str]]
 
 
 def fetch_and_extract_timeseries(
-    ids_list: List[str], start_date: str = "2022-12-24", end_date: str = "2025-12-02"
+    ids_list: List[str], start_date: str = "2022-12-24", end_date: str = "2025-12-04"
 ) -> pd.DataFrame:
     """
     Fetch timeseries data for each station ID and save to CSV.
