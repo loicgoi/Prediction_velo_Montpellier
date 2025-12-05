@@ -41,6 +41,29 @@ def get_counters(db: Session = Depends(get_db_session)):
     """
     Récupère la liste de tous les compteurs disponibles.
     """
+
+# Summary for request latency on /predict
+request_latency = Summary(
+    "request_latency_seconds", "Latency for /predict requests in seconds"
+)
+
+# Counter for /train requests
+train_counter = Counter("training_started_total", "Number of model trainings started")
+
+# Counter for /update requests
+update_counter = Counter(
+    "daily_update_started_total", "Number of daily updates started"
+)
+
+# ----------- Endpoints -----------
+
+
+@router.get("/predict", summary="Get the latest prediction for a counter")
+@request_latency.time()
+def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
+    # Increment prediction counter
+    predictions_counter.labels(station_id=station_id).inc()
+
     service = DatabaseService(db)
     counters = service.get_all_stations()
 

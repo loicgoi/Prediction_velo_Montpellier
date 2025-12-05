@@ -10,7 +10,7 @@ from .database import (
     Prediction,
     Weather,
     ModelMetrics,
-    FeaturesData,
+    FeaturesData 
 )
 from utils.logging_config import logger
 
