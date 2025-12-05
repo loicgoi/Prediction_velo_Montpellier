@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s  # How frequently Prometheus will scrape the metrics
+
+scrape_configs:
+  - job_name: 'backend'  # Name of the job
+    metrics_path: '/metrics'  # Path where Prometheus will scrape metrics
+    static_configs:
+      - targets: ['backend:8000']  # The backend service you want to scrape (make sure this matches the backend container's name and port)
