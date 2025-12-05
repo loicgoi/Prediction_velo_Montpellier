@@ -1,6 +1,6 @@
 from nicegui import ui
 
-from data import get_counter_by_id, get_mock_backend_data, get_real_weather
+from data import get_counter_by_id, get_dashboard_data, get_real_weather
 from plots import (
     plot_accuracy_7d,
     plot_history_30d,
@@ -19,7 +19,7 @@ def render_counter_content(station_id: str):
 
     lat, lon = counter["latitude"], counter["longitude"]
     weather = get_real_weather(lat, lon)
-    bd = get_mock_backend_data()  # Dummy data (to be connected to the backend)
+    bd = get_dashboard_data(station_id)
 
     # KPI calculation
     pred, real = bd["yesterday"]["predicted"], bd["yesterday"]["real"]

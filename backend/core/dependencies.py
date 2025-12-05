@@ -4,33 +4,26 @@ from dotenv import load_dotenv
 from database.database import DatabaseManager
 from utils.logging_config import logger
 
-# --- 1. Chargement intelligent du .env ---
-
-# On récupère le chemin du fichier actuel (backend/core/dependencies.py)
+# We retrieve the path of the current file (backend/core/dependencies.py)
 current_file_path = Path(__file__).resolve()
 
-# On remonte l'arborescence pour trouver la racine du projet
-# dependencies.py -> core -> backend -> Prediction_velo_Montpellier (Racine)
+# We go up the tree structure to find the root of the project.
 project_root = current_file_path.parent.parent.parent
 env_path = project_root / ".env"
 
-# On force le chargement depuis ce chemin spécifique
+# We force loading from this specific path
 load_dotenv(dotenv_path=env_path)
 
-# --- 2. Vérification et Instanciation ---
+# Verification and Instantiation
 
 db_url = os.getenv("DATABASE_URL")
 
 if not db_url:
-    # Message d'erreur explicite avec le chemin testé
-    logger.warning(f"⚠️  ALERTE : DATABASE_URL vide ! (J'ai cherché ici : {env_path})")
-    logger.warning("L'API va basculer sur SQLite (base vide).")
+    logger.warning("ALERT: DATABASE_URL is empty!")
+    logger.warning("The API will switch to SQLite (empty database).")
 else:
-    # Masquage du mot de passe pour les logs
-    safe_host = db_url.split("@")[-1] if "@" in db_url else "URL non standard"
-    logger.info(f"✅  Démarrage API avec la base : {safe_host}")
+    logger.info("Starting the API with the database!")
 
-# On passe l'URL explicite au manager
 db_manager = DatabaseManager(database_url=db_url)
 
 

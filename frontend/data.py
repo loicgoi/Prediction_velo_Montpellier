@@ -41,24 +41,6 @@ def get_counter_by_id(station_id: str) -> Optional[Dict]:
     return None
 
 
-def get_mock_backend_data() -> Dict:
-    """Simule une réponse du backend avec des données aléatoires."""
-    return {
-        "prediction_today": np.random.randint(200, 800),
-        "yesterday": {
-            "predicted": np.random.randint(200, 800),
-            "real": np.random.randint(200, 800),
-        },
-        "history_30_days": np.random.randint(150, 700, 30).tolist(),
-        "accuracy_7_days": {
-            "real": np.random.randint(300, 600, 7).tolist(),
-            "pred": np.random.randint(300, 600, 7).tolist(),
-        },
-        "weekly_averages": np.random.randint(400, 650, 7).tolist(),
-        "weekly_totals": np.random.randint(2500, 4500, 12).tolist(),
-    }
-
-
 def get_real_weather(lat: float, lon: float) -> Dict[str, str]:
     """Retrieves current weather data from the Open-Meteo API."""
     try:
@@ -73,3 +55,26 @@ def get_real_weather(lat: float, lon: float) -> Dict[str, str]:
         }
     except requests.RequestException:
         return {"temp": "--", "precip": "--", "wind": "--"}
+
+
+def get_dashboard_data(station_id: str) -> Dict:
+    """
+    Retrieves the actual aggregated data from the backend for a meter.
+    """
+    try:
+        url = f"{API_BASE_URL}/api/dashboard/{station_id}"
+
+        res = requests.get(url, timeout=4)
+        res.raise_for_status()
+        return res.json()
+    except Exception as e:
+        print(f"Error fetching dashboard for {station_id}: {e}")
+        # Returns an empty “safe” structure to prevent the UI from crashing
+        return {
+            "prediction_today": 0,
+            "yesterday": {"real": 0, "predicted": 0},
+            "history_30_days": [0] * 30,
+            "accuracy_7_days": {"real": [0] * 7, "pred": [0] * 7},
+            "weekly_averages": [0] * 7,
+            "weekly_totals": [0] * 12,
+        }
