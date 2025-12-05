@@ -21,7 +21,12 @@ def extract_station_metadata(data: List[Dict]) -> Tuple[pd.DataFrame, List[str]]
     for item in data:
         if "id" not in item:
             continue
-        station_data = {"station_id": item["id"], "latitude": None, "longitude": None}
+        station_data = {
+            "station_id": item["id"],
+            "name": None,
+            "latitude": None,
+            "longitude": None,
+        }
         try:
             if (
                 "location" in item
@@ -29,8 +34,8 @@ def extract_station_metadata(data: List[Dict]) -> Tuple[pd.DataFrame, List[str]]
                 and "coordinates" in item["location"]["value"]
             ):
                 coords = item["location"]["value"]["coordinates"]
-                station_data["longitude"] = coords[0]
-                station_data["latitude"] = coords[1]
+                station_data["latitude"] = coords[0]
+                station_data["longitude"] = coords[1]
         except Exception:
             pass
         stations_list.append(station_data)

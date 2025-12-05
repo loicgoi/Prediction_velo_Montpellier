@@ -1,36 +1,44 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 import numpy as np
 import requests
 
-# CONFIGURATION & DATA
-MOCK_COUNTERS = [
-    {"station_id": "counter-01", "name": "Albert 1er", "lat": 43.615, "lon": 3.872},
-    {"station_id": "counter-02", "name": "Lattes", "lat": 43.567, "lon": 3.908},
-    {
-        "station_id": "counter-03",
-        "name": "Place de la Comédie",
-        "lat": 43.608,
-        "lon": 3.879,
-    },
-]
+# CONFIGURATION API
+API_BASE_URL = "http://localhost:8000"
+
+# Counters cache
+_COUNTERS_CACHE: List[Dict] = []
 
 
-def get_mock_backend_data() -> Dict:
-    """Simule une réponse du backend avec des données aléatoires."""
-    return {
-        "prediction_today": np.random.randint(200, 800),
-        "yesterday": {
-            "predicted": np.random.randint(200, 800),
-            "real": np.random.randint(200, 800),
-        },
-        "history_30_days": np.random.randint(150, 700, 30).tolist(),
-        "accuracy_7_days": {
-            "real": np.random.randint(300, 600, 7).tolist(),
-            "pred": np.random.randint(300, 600, 7).tolist(),
-        },
-        "weekly_averages": np.random.randint(400, 650, 7).tolist(),
-        "weekly_totals": np.random.randint(2500, 4500, 12).tolist(),
-    }
+def get_all_counters() -> List[Dict]:
+    """
+    Retrieves the list of counters (ID, name, lat/lon) via the FastAPI API.
+    Uses a cache to avoid repeating the request each time the page is loaded.
+    """
+    global _COUNTERS_CACHE
+    if _COUNTERS_CACHE:
+        return _COUNTERS_CACHE
+
+    try:
+        url = f"{API_BASE_URL}/api/counters"
+        response = requests.get(url, timeout=2)
+        response.raise_for_status()
+
+        _COUNTERS_CACHE = response.json()
+        if not _COUNTERS_CACHE:
+            print("No counters found.")
+            return []
+        return _COUNTERS_CACHE
+    except requests.RequestException as e:
+        print(f"Error retrieving counters: {e}")
+        return []
+
+
+def get_counter_by_id(station_id: str) -> Optional[Dict]:
+    """Find a counter in the list by its ID."""
+    for counter in get_all_counters():
+        if counter["station_id"] == station_id:
+            return counter
+    return None
 
 
 def get_real_weather(lat: float, lon: float) -> Dict[str, str]:
@@ -49,6 +57,24 @@ def get_real_weather(lat: float, lon: float) -> Dict[str, str]:
         return {"temp": "--", "precip": "--", "wind": "--"}
 
 
-def get_counter_by_id(station_id: str) -> Optional[Dict]:
-    """Find a counter in the list by its ID."""
-    return next((c for c in MOCK_COUNTERS if c["station_id"] == station_id), None)
+def get_dashboard_data(station_id: str) -> Dict:
+    """
+    Retrieves the actual aggregated data from the backend for a meter.
+    """
+    try:
+        url = f"{API_BASE_URL}/api/dashboard/{station_id}"
+
+        res = requests.get(url, timeout=4)
+        res.raise_for_status()
+        return res.json()
+    except Exception as e:
+        print(f"Error fetching dashboard for {station_id}: {e}")
+        # Returns an empty “safe” structure to prevent the UI from crashing
+        return {
+            "prediction_today": 0,
+            "yesterday": {"real": 0, "predicted": 0},
+            "history_30_days": [0] * 30,
+            "accuracy_7_days": {"real": [0] * 7, "pred": [0] * 7},
+            "weekly_averages": [0] * 7,
+            "weekly_totals": [0] * 12,
+        }

@@ -15,3 +15,7 @@ OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
 # Output path for trained model
 MODELS_PATH = DATA_PATH / "models"
 MODELS_PATH.mkdir(parents=True, exist_ok=True)
+
+# Cache path
+CACHE_PATH = DATA_PATH / "cache"
+CACHE_PATH.mkdir(parents=True, exist_ok=True)

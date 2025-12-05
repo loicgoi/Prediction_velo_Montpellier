@@ -1,16 +1,31 @@
 from nicegui import ui, app
 
 from components import render_counter_content
-from data import MOCK_COUNTERS
+from data import get_all_counters, get_counter_by_id
 
 
 # UI
 @ui.page("/")
 def index():
     """Main entry point of the application and definition of the layout."""
+    all_counters = get_all_counters()
+
+    if not all_counters:
+        with ui.column().classes("w-full max-w-5xl mx-auto p-4 mt-20"):
+            ui.label(
+                "Erreur: Impossible de charger les données des compteurs depuis le backend."
+            ).classes("text-xl text-red-600 font-bold")
+            ui.label(
+                "Veuillez vérifier que l'API FastAPI est bien lancée sur http://localhost:8000/"
+            ).classes("text-lg")
+        return
+
+    default_id = all_counters[0]["station_id"]
+
     if "selected_station_id" not in app.storage.client:
-        app.storage.client["selected_station_id"] = MOCK_COUNTERS[0]["station_id"]
-    options = {c["station_id"]: c["name"] for c in MOCK_COUNTERS}
+        app.storage.client["selected_station_id"] = default_id
+
+    options = {counter["station_id"]: counter["name"] for counter in all_counters}
 
     with ui.header().classes(
         "bg-blue-900 text-white p-4 flex justify-between items-center shadow-md"

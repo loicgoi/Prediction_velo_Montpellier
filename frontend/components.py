@@ -1,6 +1,6 @@
 from nicegui import ui
 
-from data import get_counter_by_id, get_mock_backend_data, get_real_weather
+from data import get_counter_by_id, get_dashboard_data, get_real_weather
 from plots import (
     plot_accuracy_7d,
     plot_history_30d,
@@ -14,12 +14,12 @@ def render_counter_content(station_id: str):
     """Displays dynamic content (KPIs, maps, graphs) for a given counter."""
     counter = get_counter_by_id(station_id)
     if not counter:
-        ui.label("Compteur non trouvé.")
+        ui.label("Compteur non trouvé (ID invalide ou API inaccessible).")
         return
 
-    lat, lon = counter["lat"], counter["lon"]
+    lat, lon = counter["latitude"], counter["longitude"]
     weather = get_real_weather(lat, lon)
-    bd = get_mock_backend_data()  # Dummy data (to be connected to the backend)
+    bd = get_dashboard_data(station_id)
 
     # KPI calculation
     pred, real = bd["yesterday"]["predicted"], bd["yesterday"]["real"]

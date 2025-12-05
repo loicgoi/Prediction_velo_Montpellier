@@ -4,6 +4,7 @@ from retry_requests import retry
 from typing import Any, List
 import requests
 from utils.logging_config import logger
+from utils.paths import CACHE_PATH
 
 
 class OpenMeteoDailyAPIC:
@@ -18,7 +19,7 @@ class OpenMeteoDailyAPIC:
         """
         try:
             cache_session = requests_cache.CachedSession(
-                "../data/cache/.cache", expire_after=3600
+                CACHE_PATH / ".cache_daily", expire_after=3600
             )
             self.session = retry(cache_session, retries=5, backoff_factor=0.2)
             self.client = openmeteo_requests.Client(session=self.session)
