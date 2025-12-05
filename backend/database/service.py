@@ -143,7 +143,9 @@ class DatabaseService:
         )
         return result[0] if result else None
 
-    def save_prediction_single_with_context(self, pred_data: Dict, features_data: Dict) -> bool:
+    def save_prediction_single_with_context(
+        self, pred_data: Dict, features_data: Dict
+    ) -> bool:
         """
         Saves ONE prediction AND its associated JSON context in a single transaction.
         Uses .flush() to retrieve the generated prediction ID before creating the context entry.
@@ -152,44 +154,47 @@ class DatabaseService:
             # 1. Create Prediction Object
             prediction = Prediction(**pred_data)
             self.session.add(prediction)
-            
+
             # 2. Flush: Send to DB to generate prediction.id (transaction remains open)
-            self.session.flush() 
+            self.session.flush()
 
             # 3. Create linked FeaturesData Object
             features = FeaturesData(
-                prediction_id=prediction.id, # The Foreign Key is now available
+                prediction_id=prediction.id,  # The Foreign Key is now available
                 station_id=pred_data["station_id"],
                 date=pred_data["prediction_date"],
-                features=features_data, # SQLAlchemy automatically handles Dict -> JSON conversion
-                target_intensity=None
+                features=features_data,  # SQLAlchemy automatically handles Dict -> JSON conversion
+                target_intensity=None,
             )
             self.session.add(features)
-            
+
             # 4. Final Commit (Both rows saved together)
             self.session.commit()
             return True
-            
+
         except SQLAlchemyError as e:
             self.session.rollback()
-            logger.error(f"Transaction failed for prediction {pred_data.get('station_id')}: {e}")
+            logger.error(
+                f"Transaction failed for prediction {pred_data.get('station_id')}: {e}"
+            )
             return False
-# --- Monitoring ---#
+
+    # --- Monitoring ---#
 
     def get_predictions_by_date(self, target_date: datetime) -> List[Prediction]:
         """
         Récupère toutes les prédictions faites pour une date cible.
         """
         # On filtre sur la date
-        return self.session.query(Prediction).filter(
-            Prediction.prediction_date == target_date
-        ).all()
+        return (
+            self.session.query(Prediction)
+            .filter(Prediction.prediction_date == target_date)
+            .all()
+        )
 
     def get_actuals_by_date(self, target_date: datetime) -> List[BikeCount]:
         """
         Récupère les comptages réels pour une date donnée.
         Utile pour le monitoring (La vérité terrain).
         """
-        return self.session.query(BikeCount).filter(
-            BikeCount.date == target_date
-        ).all()
+        return self.session.query(BikeCount).filter(BikeCount.date == target_date).all()
