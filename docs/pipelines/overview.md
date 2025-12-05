@@ -8,11 +8,11 @@ L'application dispose de deux points d'entrée principaux situés à la racine d
 
 ### main_initialize.py : Script d'installation.
 
-Initialise la base de données.
+- Initialise la base de données.
 
-Récupère tout l'historique (2023-Aujourd'hui).
+- Récupère tout l'historique (2023-Aujourd'hui).
 
-Entraîne le premier modèle.
+- Entraîne le premier modèle.
 
 ### main.py : Interface CLI (Menu) pour le débogage et l'exécution manuelle des tâches quotidiennes.
 
@@ -21,16 +21,17 @@ Le Flux Quotidien (Daily Batch)
 **En production, le système exécute deux scripts séquentiellement chaque matin :**
 
 ```mermaid
+
 graph TD
-    A[Déclencheur (CRON 07:00)] --> B[daily_update.py]
-    B --> C{Données J-1 dispo ?}
-    C -->|Oui| D[Mise à jour BDD]
-    D --> E[Monitoring Performance]
-    C -->|Non| F[Log Warning & Arrêt]
-    E --> G[daily_prediction.py]
-    G --> H[Récupération Météo J0]
-    H --> I[Construction Lags via BDD]
-    I --> J[Inférence & Sauvegarde]
+    A["Déclencheur (07:00)"] --> B("daily_update.py")
+    B --> C{"Données J-1 dispo ?"}
+    C -- Oui --> D["Mise à jour BDD"]
+    D --> E["Monitoring Performance"]
+    C -- Non --> F["Log Warning & Arrêt"]
+    E --> G("daily_prediction.py")
+    G --> H["Récupération Météo J0"]
+    H --> I["Construction Lags via BDD"]
+    I --> J["Inférence & Sauvegarde"]
    
 ```
 

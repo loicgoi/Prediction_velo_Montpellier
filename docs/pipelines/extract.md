@@ -1,16 +1,16 @@
 # Collecte de Données (Extract)
 
-Le module backend.download contient les connecteurs vers les APIs externes.
+Le module download contient les connecteurs vers les APIs externes.
 
 ## Stratégie de Pagination (Chunking)
 
 L'API EcoCompteur de Montpellier impose une limite de taille par requête. Pour contourner cela, nous avons implémenté une stratégie de découpage temporel :
 
-La période totale est divisée en sous-périodes (chunks) de 6 mois.
+- La période totale est divisée en sous-périodes (chunks) de 6 mois.
 
-Si la période demandée est d'un seul jour (mise à jour quotidienne), un chunk unique est généré.
+- Si la période demandée est d'un seul jour (mise à jour quotidienne), un chunk unique est généré.
 
-Les résultats sont agrégés dans une liste unique avant d'être retournés.
+- Les résultats sont agrégés dans une liste unique avant d'être retournés.
 
 ## API Trafic
 
