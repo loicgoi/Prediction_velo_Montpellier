@@ -10,6 +10,19 @@
 
 Ce projet est une application de Machine Learning conçue pour prédire le trafic cyclable journalier sur les compteurs de la métropole de Montpellier.
 
+## Documentation
+
+**En local** :
+
+Afin de ne pas rentrer en conflit avec le serveur fastapi, toujours lancer mkdocs depuis le port 8001.
+
+```
+source backend/.venv/bin/activate
+
+mkdocs serve -a localhost:8001
+
+```
+
 Il intègre l'ensemble du cycle de vie de la donnée : de la collecte (ETL) à la restitution (Frontend), en passant par l'entraînement du modèle et le monitoring des performances.
 
 ## Architecture projet
