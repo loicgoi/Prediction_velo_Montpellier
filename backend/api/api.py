@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from api.endpoints import router as api_router
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_client import make_asgi_app  # Corrected to use ASGI app
+from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI(
     title="Prévision du Trafic Cyclable Montpellier",
@@ -21,6 +23,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Expose Prometheus metrics through ASGI
+app.mount("/metrics", make_asgi_app())
 
 
 # Ajout d'une route à la racine de l'application
