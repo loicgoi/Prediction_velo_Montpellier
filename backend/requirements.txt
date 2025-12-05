@@ -7,6 +7,7 @@ annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.11.0
 appnope==0.1.4
+APScheduler==3.11.1
 asttokens==3.0.1
 attrs==25.4.0
 bidict==0.23.1
@@ -43,6 +44,7 @@ httptools==0.7.1
 httpx==0.28.1
 idna==3.11
 ifaddr==0.2.0
+iniconfig==2.3.0
 ipykernel==7.1.0
 ipython==9.7.0
 ipython_pygments_lexers==1.1.1
@@ -67,6 +69,7 @@ nest-asyncio==1.6.0
 nicegui==3.3.1
 niquests==3.15.2
 numpy==2.3.5
+nvidia-nccl-cu12==2.28.9
 openmeteo_requests==1.7.4
 openmeteo_sdk==1.23.0
 orjson==3.11.4
@@ -77,6 +80,7 @@ pexpect==4.9.0
 pillow==12.0.0
 platformdirs==4.5.0
 plotly==6.5.0
+pluggy==1.6.0
 prometheus_client==0.23.1
 prompt_toolkit==3.0.52
 propcache==0.4.1
@@ -90,6 +94,7 @@ pyodbc==5.3.0
 pyogrio==0.12.1
 pyparsing==3.2.5
 pyproj==3.7.2
+pytest==9.0.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 python-engineio==4.12.3
@@ -124,6 +129,7 @@ typer==0.20.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 tzdata==2025.2
+tzlocal==5.3.1
 url-normalize==2.2.1
 urllib3==2.5.0
 urllib3-future==2.14.907
