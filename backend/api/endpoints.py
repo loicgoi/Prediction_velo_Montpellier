@@ -2,11 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from prometheus_client import Counter, Summary, generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response
+from typing import List
+from api.schema import CounterDTO
+
 from database.service import DatabaseService
 from core.dependencies import get_db_session
 from core.training import run_model_training
 from pipelines.daily_update import run_daily_update
 from utils.logging_config import logger
+
 
 router = APIRouter()
 
@@ -30,6 +34,22 @@ update_counter = Counter(
 )
 
 # ----------- Endpoints -----------
+
+
+@router.get("/counters", response_model=List[CounterDTO])
+def get_counters(db: Session = Depends(get_db_session)):
+    """
+    Récupère la liste de tous les compteurs disponibles.
+    """
+    service = DatabaseService(db)
+    counters = service.get_all_stations()
+
+    if not counters:
+        # On peut choisir de renvoyer une liste vide ou une 404,
+        # mais une liste vide est souvent préférable pour le frontend.
+        return []
+
+    return counters
 
 
 @router.get("/predict", summary="Get the latest prediction for a counter")
