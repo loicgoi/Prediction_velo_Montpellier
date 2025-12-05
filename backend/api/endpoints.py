@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from prometheus_client import Counter, Summary, generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response
-from typing import List
+from typing import List, Dict, Any
 from api.schema import CounterDTO
 
 from database.service import DatabaseService
@@ -40,16 +40,6 @@ def get_counters(db: Session = Depends(get_db_session)):
     """
     Récupère la liste de tous les compteurs disponibles.
     """
-    # Add your code to get the counters from the database if needed
-    return []
-
-
-@router.get("/predict", summary="Get the latest prediction for a counter")
-@request_latency.time()
-def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
-    # Increment prediction counter
-    predictions_counter.labels(station_id=station_id).inc()
-
     service = DatabaseService(db)
     counters = service.get_all_stations()
 
@@ -59,6 +49,41 @@ def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
         return []
 
     return counters
+
+
+@router.get("/predict", summary="Get the latest prediction for a counter")
+@request_latency.time()
+def get_prediction(
+    station_id: str, db: Session = Depends(get_db_session)
+) -> Dict[str, Any]:
+    """
+    Returns the most recent prediction for a given `station_id`.
+    """
+    # Increment prediction counter metric
+    predictions_counter.labels(station_id=station_id).inc()
+
+    service = DatabaseService(db)
+    prediction = service.get_latest_prediction_for_counter(station_id)
+
+    # --- CORRECTION CRITIQUE ICI ---
+    # Si l'ID n'existe pas ou s'il n'y a pas de prédiction, on renvoie une 404
+    if not prediction:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Aucune prédiction trouvée pour le compteur {station_id}",
+        )
+
+    # Convert the SQLAlchemy object to a dict for JSON serialization
+    return {
+        "id": prediction.id,
+        "station_id": prediction.station_id,
+        "prediction_date": prediction.prediction_date.isoformat(),
+        "prediction_value": prediction.prediction_value,
+        "model_version": prediction.model_version,
+        "created_at": prediction.created_at.isoformat()
+        if prediction.created_at
+        else None,
+    }
 
 
 @router.post("/train", status_code=202, summary="Start model retraining")
