@@ -44,8 +44,6 @@ def get_counters(db: Session = Depends(get_db_session)):
     counters = service.get_all_stations()
 
     if not counters:
-        # On peut choisir de renvoyer une liste vide ou une 404,
-        # mais une liste vide est souvent préférable pour le frontend.
         return []
 
     return counters
@@ -65,8 +63,7 @@ def get_prediction(
     service = DatabaseService(db)
     prediction = service.get_latest_prediction_for_counter(station_id)
 
-    # --- CORRECTION CRITIQUE ICI ---
-    # Si l'ID n'existe pas ou s'il n'y a pas de prédiction, on renvoie une 404
+    # If the ID does not exist or there is no prediction, a 404 is returned.
     if not prediction:
         raise HTTPException(
             status_code=404,
