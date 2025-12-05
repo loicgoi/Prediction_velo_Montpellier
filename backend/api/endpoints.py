@@ -11,7 +11,6 @@ from core.training import run_model_training
 from pipelines.daily_update import run_daily_update
 from utils.logging_config import logger
 
-
 router = APIRouter()
 
 # ----------- Metrics -----------
@@ -41,21 +40,8 @@ def get_counters(db: Session = Depends(get_db_session)):
     """
     Récupère la liste de tous les compteurs disponibles.
     """
-
-# Summary for request latency on /predict
-request_latency = Summary(
-    "request_latency_seconds", "Latency for /predict requests in seconds"
-)
-
-# Counter for /train requests
-train_counter = Counter("training_started_total", "Number of model trainings started")
-
-# Counter for /update requests
-update_counter = Counter(
-    "daily_update_started_total", "Number of daily updates started"
-)
-
-# ----------- Endpoints -----------
+    # Add your code to get the counters from the database if needed
+    return []
 
 
 @router.get("/predict", summary="Get the latest prediction for a counter")
@@ -73,33 +59,6 @@ def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
         return []
 
     return counters
-
-
-@router.get("/predict", summary="Get the latest prediction for a counter")
-@request_latency.time()
-def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
-    # Increment prediction counter
-    predictions_counter.labels(station_id=station_id).inc()
-
-    service = DatabaseService(db)
-    prediction = service.get_latest_prediction_for_counter(station_id)
-
-    if not prediction:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No predictions found for the counter {station_id}",
-        )
-
-    return {
-        "id": prediction.id,
-        "station_id": prediction.station_id,
-        "prediction_date": prediction.prediction_date.isoformat(),
-        "prediction_value": prediction.prediction_value,
-        "model_version": prediction.model_version,
-        "created_at": prediction.created_at.isoformat()
-        if prediction.created_at
-        else None,
-    }
 
 
 @router.post("/train", status_code=202, summary="Start model retraining")
