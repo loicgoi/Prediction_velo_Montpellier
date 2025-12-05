@@ -1,0 +1,40 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+.venv/
+venv/
+env/
+
+# Ignore local environment files (handled externally)
+../.env
+.env
+
+# Ignore system files
+.DS_Store
+.idea/
+.vscode/
+
+# Git files
+.git/
+.gitignore
+
+# Ignore local data
+*.db
+*.sqlite3
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Docker files not needed inside container
+docker-compose.yml
+docker-compose.yaml
+
+# Logs
+*.log
+logs/

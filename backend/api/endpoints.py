@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-
+from prometheus_client import Counter, Summary, generate_latest, CONTENT_TYPE_LATEST
+from fastapi.responses import Response
 from database.service import DatabaseService
 from core.dependencies import get_db_session
 from core.training import run_model_training
@@ -9,12 +10,34 @@ from utils.logging_config import logger
 
 router = APIRouter()
 
+# ----------- Metrics -----------
+# Counter for /predict requests per station
+predictions_counter = Counter(
+    "predictions_total", "Total number of predictions made", ["station_id"]
+)
 
-@router.get("/predict", summary="Récupérer la dernière prédiction pour un compteur")
+# Summary for request latency on /predict
+request_latency = Summary(
+    "request_latency_seconds", "Latency for /predict requests in seconds"
+)
+
+# Counter for /train requests
+train_counter = Counter("training_started_total", "Number of model trainings started")
+
+# Counter for /update requests
+update_counter = Counter(
+    "daily_update_started_total", "Number of daily updates started"
+)
+
+# ----------- Endpoints -----------
+
+
+@router.get("/predict", summary="Get the latest prediction for a counter")
+@request_latency.time()
 def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
-    """
-    Returns the most recent prediction for a given `counter_id`.
-    """
+    # Increment prediction counter
+    predictions_counter.labels(station_id=station_id).inc()
+
     service = DatabaseService(db)
     prediction = service.get_latest_prediction_for_counter(station_id)
 
@@ -24,7 +47,6 @@ def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
             detail=f"No predictions found for the counter {station_id}",
         )
 
-    # Convert the SQLAlchemy object to a dict for JSON serialization
     return {
         "id": prediction.id,
         "station_id": prediction.station_id,
@@ -32,30 +54,37 @@ def get_prediction(station_id: str, db: Session = Depends(get_db_session)):
         "prediction_value": prediction.prediction_value,
         "model_version": prediction.model_version,
         "created_at": prediction.created_at.isoformat()
-        if prediction.created_at  # type: ignore
+        if prediction.created_at
         else None,
     }
 
 
-@router.post("/train", status_code=202, summary="Lancer un réentraînement du modèle")
+@router.post("/train", status_code=202, summary="Start model retraining")
 def trigger_training(background_tasks: BackgroundTasks):
+    # Increment training counter
+    train_counter.inc()
     logger.info("Request for retraining received.")
     background_tasks.add_task(run_model_training)
     return {
         "status": "training_started",
-        "message": "Le réentraînement du modèle a été lancé en arrière-plan.",
+        "message": "Model retraining started in background.",
     }
 
 
-@router.post(
-    "/update",
-    status_code=202,
-    summary="Lancer la mise à jour quotidienne des données",
-)
+@router.post("/update", status_code=202, summary="Start daily data update")
 def trigger_daily_update(background_tasks: BackgroundTasks):
+    # Increment daily update counter
+    update_counter.inc()
     logger.info("Request for daily data updates received.")
     background_tasks.add_task(run_daily_update)
     return {
         "status": "daily_update_started",
-        "message": "La mise à jour des données de J-1 a été lancée en arrière-plan.",
+        "message": "Daily update started in background.",
     }
+
+
+@router.get("/metrics")
+def metrics():
+    # Expose Prometheus metrics
+    data = generate_latest()
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
