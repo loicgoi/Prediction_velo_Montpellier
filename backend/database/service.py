@@ -174,3 +174,22 @@ class DatabaseService:
             self.session.rollback()
             logger.error(f"Transaction failed for prediction {pred_data.get('station_id')}: {e}")
             return False
+# --- Monitoring ---#
+
+    def get_predictions_by_date(self, target_date: datetime) -> List[Prediction]:
+        """
+        Récupère toutes les prédictions faites pour une date cible.
+        """
+        # On filtre sur la date
+        return self.session.query(Prediction).filter(
+            Prediction.prediction_date == target_date
+        ).all()
+
+    def get_actuals_by_date(self, target_date: datetime) -> List[BikeCount]:
+        """
+        Récupère les comptages réels pour une date donnée.
+        Utile pour le monitoring (La vérité terrain).
+        """
+        return self.session.query(BikeCount).filter(
+            BikeCount.date == target_date
+        ).all()
