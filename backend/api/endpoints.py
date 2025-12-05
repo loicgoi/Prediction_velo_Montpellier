@@ -112,3 +112,36 @@ def metrics():
     # Expose Prometheus metrics
     data = generate_latest()
     return Response(content=data, media_type=CONTENT_TYPE_LATEST)
+
+
+@router.get("/dashboard/{station_id}")
+def get_dashboard_data(station_id: str, db: Session = Depends(get_db_session)):
+    """
+    Aggregated endpoint for the frontend: returns Prediction of the day + History.
+    """
+    service = DatabaseService(db)
+
+    # Daily prediction (D0)
+    pred_today = service.get_latest_prediction_for_counter(station_id)
+    pred_val = pred_today.prediction_value if pred_today else 0
+
+    # Yesterday's prediction (D-1) and yesterday's actual (D-1) for the KPI
+    # We could add it in get_dashboard_stats, but we can deduce it on the front end
+    # if get_dashboard_stats returns the specific lists.
+
+    # Historical statistics
+    stats = service.get_dashboard_stats(station_id)
+
+    # We calculate the “Yesterday” KPI here to simplify the frontend.
+    # We take the last value from the ‘accuracy’ lists.
+    acc_real = stats["accuracy_7_days"]["real"]
+    acc_pred = stats["accuracy_7_days"]["pred"]
+
+    yesterday_real = acc_real[-1] if acc_real else 0
+    yesterday_pred = acc_pred[-1] if acc_pred else 0
+
+    return {
+        "prediction_today": pred_val,
+        "yesterday": {"real": yesterday_real, "predicted": yesterday_pred},
+        **stats,  # Unpack history, weekly_averages, etc.
+    }
