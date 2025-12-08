@@ -69,7 +69,6 @@ nest-asyncio==1.6.0
 nicegui==3.3.1
 niquests==3.15.2
 numpy==2.3.5
-nvidia-nccl-cu12==2.28.9
 openmeteo_requests==1.7.4
 openmeteo_sdk==1.23.0
 orjson==3.11.4
@@ -94,7 +93,7 @@ pyodbc==5.3.0
 pyogrio==0.12.1
 pyparsing==3.2.5
 pyproj==3.7.2
-pytest==9.0.1
+pytest==9.0.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 python-engineio==4.12.3
