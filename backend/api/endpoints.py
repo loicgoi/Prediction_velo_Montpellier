@@ -7,7 +7,7 @@ from api.schema import CounterDTO
 
 from database.service import DatabaseService
 from core.dependencies import get_db_session
-from core.training import run_model_training
+from core.training_orchestrator import run_model_training
 from pipelines.daily_update import run_daily_update
 from utils.logging_config import logger
 

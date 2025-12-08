@@ -15,9 +15,9 @@ def index():
             ui.label(
                 "Erreur: Impossible de charger les données des compteurs depuis le backend."
             ).classes("text-xl text-red-600 font-bold")
-            ui.label(
-                "Veuillez vérifier que l'API FastAPI est bien lancée sur http://localhost:8000/"
-            ).classes("text-lg")
+            ui.label("Veuillez vérifier que l'API FastAPI est bien lancée").classes(
+                "text-lg"
+            )
         return
 
     default_id = all_counters[0]["station_id"]

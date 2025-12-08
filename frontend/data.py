@@ -1,9 +1,34 @@
+import os
 from typing import Dict, Optional, List
 import numpy as np
 import requests
 
+
 # CONFIGURATION API
-API_BASE_URL = "http://localhost:8000"
+def _get_api_url() -> str:
+    """
+    Determines the API base URL with a smart fallback mechanism.
+    The function prioritizes the URL in the following order:
+
+    1.  **Environment Variable (`API_BASE_URL`)**:
+        Used for production deployments like Azure App Service.
+
+    2.  **Docker Environment**:
+        If the file `/.dockerenv` exists, it assumes it's running in a Docker
+        container via Docker Compose and uses the service name.
+
+    3.  **Local Development**:
+        As a final fallback, it uses `localhost` for local development
+        without containers.
+    """
+    if "API_BASE_URL" in os.environ:
+        return os.environ["API_BASE_URL"]
+    if os.path.exists("/.dockerenv"):
+        return "http://backend:8000"  # Docker Compose service name
+    return "http://localhost:8000"  # Local development without Docker
+
+
+API_BASE_URL = _get_api_url()
 
 # Counters cache
 _COUNTERS_CACHE: List[Dict] = []
