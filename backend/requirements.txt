@@ -32,6 +32,7 @@ fastapi-cloud-cli==0.5.1
 fastar==0.6.0
 flatbuffers==25.9.23
 fonttools==4.60.1
+freezegun==1.5.5
 frozenlist==1.8.0
 geographiclib==2.1
 geopandas==1.1.1

@@ -123,7 +123,16 @@ def get_dashboard_data(station_id: str, db: Session = Depends(get_db_session)):
 
     # Daily prediction (D0)
     pred_today = service.get_latest_prediction_for_counter(station_id)
-    pred_val = pred_today.prediction_value if pred_today else 0
+
+    # Prepare prediction info, including its date for the frontend to check freshness.
+    if pred_today:
+        prediction_info = {
+            "value": pred_today.prediction_value,
+            "date": pred_today.prediction_date.isoformat(),
+        }
+    else:
+        # If no prediction is available at all for this counter
+        prediction_info = {"value": 0, "date": None}
 
     # Yesterday's prediction (D-1) and yesterday's actual (D-1) for the KPI
     # We could add it in get_dashboard_stats, but we can deduce it on the front end
@@ -141,7 +150,7 @@ def get_dashboard_data(station_id: str, db: Session = Depends(get_db_session)):
     yesterday_pred = acc_pred[-1] if acc_pred else 0
 
     return {
-        "prediction_today": pred_val,
+        "prediction": prediction_info,
         "yesterday": {"real": yesterday_real, "predicted": yesterday_pred},
         **stats,  # Unpack history, weekly_averages, etc.
     }

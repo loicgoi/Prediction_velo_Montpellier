@@ -96,7 +96,7 @@ def get_dashboard_data(station_id: str) -> Dict:
         print(f"Error fetching dashboard for {station_id}: {e}")
         # Returns an empty “safe” structure to prevent the UI from crashing
         return {
-            "prediction_today": 0,
+            "prediction": {"value": 0, "date": None},
             "yesterday": {"real": 0, "predicted": 0},
             "history_30_days": [0] * 30,
             "accuracy_7_days": {"real": [0] * 7, "pred": [0] * 7},
