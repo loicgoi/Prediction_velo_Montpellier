@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from api.endpoints import router as api_router
@@ -6,6 +9,10 @@ from prometheus_client import make_asgi_app  # Corrected to use ASGI app
 from starlette.middleware.base import BaseHTTPMiddleware
 from core.scheduler import start_scheduler, shutdown_scheduler
 from utils.logging_config import logger
+
+load_dotenv()
+
+API_BASE_URL = os.getenv("API_BASE_URL")
 
 
 @asynccontextmanager
@@ -35,6 +42,7 @@ app = FastAPI(
 origins = [
     "http://localhost:8080",  # Port par défaut de NiceGUI
     "http://127.0.0.1:8080",
+    API_BASE_URL,
 ]
 
 app.add_middleware(
