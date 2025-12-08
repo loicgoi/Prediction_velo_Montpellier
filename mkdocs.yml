@@ -37,6 +37,7 @@ nav:
     - Préparation (Transform): ml/features.md
     - Modélisation: ml/modeling.md
     - Monitoring: ml/monitoring.md
+  - Logique Prédiction J0: ml/logique_predict_daily.md
   - API & Frontend: api_frontend.md
 
 # --- AJOUT : Extensions Markdown pour Mermaid ---

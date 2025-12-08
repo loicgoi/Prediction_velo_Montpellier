@@ -1,19 +1,19 @@
 # Documentation Technique : Pipeline de Prediction J0
 
-## 1. Fonctionnement General & Sequence
+## 1. Fonctionnement Général & Séquence
 
-Ce pipeline a pour but de predire le trafic cyclable de la journee en cours (J0) pour l'ensemble des stations.
-C'est un processus de type Batch (traitement par lot) concu pour etre execute chaque matin.
+Ce pipeline a pour but de predire le trafic cyclable de la journée en cours (J0) pour l'ensemble des stations.
+C'est un processus de type Batch (traitement par lot) conçu pour être exécuté chaque matin.
 
 **La logique "Miroir"**
 
-Contrairement a l'entrainement ou l'on dispose d'un historique continu, la prediction a J0 necessite de reconstruire artificiellement une ligne de donnees pour chaque station en assemblant des informations eparses :
+Contrairement a l'entrainement ou l'on dispose d'un historique continu, la prediction a J0 nécessite de reconstruire artificiellement une ligne de données pour chaque station en assemblant des informations éparses :
 
-**Le Futur (Meteo) :** On recupere les previsions pour aujourd'hui.
+**Le Futur (Meteo) :** On récupère les prévisions pour aujourd'hui.
 
-**Le Passe (Lags) :** On interroge la base de donnees pour retrouver les valeurs d'hier (J-1) et de la semaine derniere (J-7).
+**Le Passé (Lags) :** On interroge la base de données pour retrouver les valeurs d'hier (J-1) et de la semaine dernière (J-7).
 
-### Diagramme de Sequence
+### Diagramme de Séquence
 
 Ce schema illustre les interactions entre l'orchestrateur et les differents modules.
 
@@ -86,17 +86,17 @@ sequenceDiagram
 
 ## 3. Modifications apportees aux Fichiers Preexistants
 
-Pour permettre le bon fonctionnement du pipeline, le fichier backend/database/service.py a du evoluer :
+Pour permettre le bon fonctionnement du pipeline, le fichier backend/database/service.py a du évoluer :
 
-**Ajout de methodes de Lecture (GET) :**
+**Ajout de méthodes de Lecture (GET) :**
 
-get_all_stations() : Pour savoir sur qui predire.
+get_all_stations() : Pour savoir sur qui prédire.
 
-get_bike_count(station_id, date) : Pour aller chercher chirurgicalement la valeur du passe necessaire aux Lags.
+get_bike_count(station_id, date) : Pour aller chercher précisemment la valeur du passé nécessaire aux Lags.
 
-**Ajout d'une methode d'Ecriture Transactionnelle (POST) :**
+**Ajout d'une méthode d'Ecriture Transactionnelle (POST) :**
 
-save_prediction_single_with_context(...) : Cette methode sauvegarde la prediction ET son contexte JSON en une seule transaction atomique. Elle utilise un .flush() pour garantir que le lien (Cle Etrangere) entre la prediction et ses features est correct.
+save_prediction_single_with_context(...) : Cette méthode sauvegarde la prediction ET son contexte JSON en une seule transaction atomique. Elle utilise un .flush() pour garantir que le lien (Cle Etrangere) entre la prediction et ses features est correct.
 
 Le fichier backend/main.py a egalement ete modifie pour ajouter l'option 10 au menu principal.
 
@@ -106,9 +106,9 @@ Le fichier backend/main.py a egalement ete modifie pour ajouter l'option 10 au m
 
 *Avant de lancer la prediction J0, le systeme doit etre dans l'etat suivant :*
 
-Base de donnees initialisee : Les tables doivent exister.
+- Base de données initialisée : Les tables doivent exister.
 
-Donnees presentes : La table bike_count doit contenir des donnees pour J-1 et J-7. Si la base est vide, le pipeline s'arretera (securite).
+- Données présentes : La table bike_count doit contenir des données pour J-1 et J-7. Si la base est vide, le pipeline s'arretera (sécurité).
 
-Modeles entraines : Les fichiers xgboost_v1.pkl et preprocessor_v1.pkl doivent etre presents dans backend/data/models/.
+- Modèles entraînés : Les fichiers xgboost_v1.pkl et preprocessor_v1.pkl doivent etre presents dans backend/data/models/.
 
