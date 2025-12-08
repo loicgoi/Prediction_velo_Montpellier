@@ -33,6 +33,7 @@ nav:
     - Vue d'ensemble: pipelines/overview.md
     - Collecte (Extract): pipelines/extract.md
     - Base de Données (Load): pipelines/load.md
+    - Réentrainement: pipelines/retraining.md
   - Machine Learning:
     - Préparation (Transform): ml/features.md
     - Modélisation: ml/modeling.md
