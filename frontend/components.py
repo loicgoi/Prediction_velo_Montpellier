@@ -1,5 +1,6 @@
 from nicegui import ui
 
+from datetime import datetime
 from data import get_counter_by_id, get_dashboard_data, get_real_weather
 from plots import (
     plot_accuracy_7d,
@@ -21,6 +22,22 @@ def render_counter_content(station_id: str):
     weather = get_real_weather(lat, lon)
     bd = get_dashboard_data(station_id)
 
+    # --- NEW: Extract prediction info and check for staleness ---
+    prediction_info = bd.get("prediction", {"value": 0, "date": None})
+    prediction_value = prediction_info.get("value", 0)
+    prediction_date_str = prediction_info.get("date")
+
+    is_stale = False
+    is_missing = False
+    if prediction_date_str:
+        prediction_date = datetime.fromisoformat(prediction_date_str).date()
+        today = datetime.now().date()
+        if prediction_date != today:
+            is_stale = True
+    else:
+        # No date means no prediction was ever found for this counter
+        is_missing = True
+
     # KPI calculation
     pred, real = bd["yesterday"]["predicted"], bd["yesterday"]["real"]
     delta = real - pred
@@ -29,6 +46,24 @@ def render_counter_content(station_id: str):
 
     # Header
     ui.label(f"{counter['name']}").classes("text-xl font-bold text-primary mb-2")
+
+    # Display warning if data is stale or missing
+    if is_stale:
+        with ui.card().classes("w-full bg-amber-100 border-l-4 border-amber-500 mb-4"):
+            with ui.row().classes("items-center"):
+                ui.icon("warning", color="amber-500").classes("mr-2")
+                ui.label(
+                    f"Les données de l'API externe ne sont pas à jour. "
+                    f"La prédiction affichée est basée sur les dernières données disponibles en date du {prediction_date.strftime('%d/%m/%Y')}."
+                ).classes("text-amber-800")
+    elif is_missing:
+        with ui.card().classes("w-full bg-red-100 border-l-4 border-red-500 mb-4"):
+            with ui.row().classes("items-center"):
+                ui.icon("error", color="red-500").classes("mr-2")
+                ui.label(
+                    "Aucune prédiction n'est disponible pour ce compteur. "
+                    "Les données historiques sont peut-être insuffisantes ou le service est indisponible."
+                ).classes("text-red-800")
 
     with ui.tabs().classes("w-full") as tabs:
         info_tab = ui.tab("Tableau de Bord")
@@ -55,7 +90,7 @@ def render_counter_content(station_id: str):
                             ui.icon("directions_bike", size="xl").classes(
                                 "text-blue-600"
                             )
-                            ui.label(f"{bd['prediction_today']}").classes(
+                            ui.label(f"{prediction_value}").classes(
                                 "text-4xl font-bold text-blue-900"
                             )
                     with ui.card().classes("w-full"):
@@ -91,7 +126,7 @@ def render_counter_content(station_id: str):
                     )
 
                     plot_history_30d(
-                        ax_dict["A"], bd["history_30_days"], bd["prediction_today"]
+                        ax_dict["A"], bd["history_30_days"], prediction_value
                     )
                     plot_weekly_averages(ax_dict["B"], bd["weekly_averages"])
                     plot_accuracy_7d(
