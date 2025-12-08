@@ -2,8 +2,8 @@ version: '3.9'
 
 services:
   backend:
-    build:
-      context: ./backend
+    image: salehch/backend:latest
+    platform: linux/amd64   # Force x86_64 to work on ARM Macs
     container_name: backend
     ports:
       - "8000:8000"
@@ -14,11 +14,13 @@ services:
       - monitoring
 
   frontend:
-    build:
-      context: ./frontend
+    image: salehch/frontend:latest
+    platform: linux/amd64
     container_name: frontend
     ports:
       - "8080:8080"
+    environment:
+      - API_BASE_URL=http://backend:8000
     depends_on:
       - backend
     restart: always
@@ -27,6 +29,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
+    platform: linux/amd64
     container_name: prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
@@ -39,6 +42,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    platform: linux/amd64
     container_name: grafana
     ports:
       - "3000:3000"
