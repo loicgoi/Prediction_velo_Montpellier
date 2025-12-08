@@ -22,7 +22,7 @@ jobs:
         working-directory: ./backend
         run: |
           pip install -r requirements.txt
-          python -m pytest
+          pytest -q
 
       # Frontend tests (Python/NiceGUI)
       - name: Run frontend tests
