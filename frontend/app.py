@@ -49,4 +49,4 @@ def index():
         render_counter_content(app.storage.client["selected_station_id"])
 
 
-ui.run()
+ui.run(host="0.0.0.0", port=8000, title="Vélo Montpellier IA", favicon="🚴")
