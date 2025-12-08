@@ -3,11 +3,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from utils.logging_config import logger
-
-# Adjust path to locate the models folder
-# Go up from backend/modeling/ to backend/data/models
-BASE_DIR = Path(__file__).resolve().parent.parent
-MODELS_PATH = BASE_DIR / "data/models"
+from utils.paths import MODELS_PATH
 
 
 class TrafficPredictor:

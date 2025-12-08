@@ -73,23 +73,29 @@ def run_prediction_pipeline():
 
         rows = []
         for station in stations:
-            # A. Retrieve J-7 (One week ago) - CRITICAL BASELINE
+            # A. Retrieve J-1 (Yesterday) and J-7 (One week ago)
+            val_lag_1 = service.get_bike_count(station.station_id, yesterday)
             val_lag_7 = service.get_bike_count(station.station_id, j_minus_7)
 
-            # If we don't even have last week's data, we skip this station
-            # (Too risky to predict without any history)
-            if val_lag_7 is None:
-                continue
+            # B. --- ROBUST FALLBACK STRATEGY ---
+            # If specific lags are missing due to API outage, find the most recent data point.
+            if val_lag_1 is None or val_lag_7 is None:
+                logger.warning(
+                    f"Lags missing for {station.station_id}. Attempting robust fallback."
+                )
+                most_recent_count = service.get_most_recent_bike_count(
+                    station.station_id
+                )
 
-            # B. Retrieve J-1 (Yesterday)
-            val_lag_1 = service.get_bike_count(station.station_id, yesterday)
+                if most_recent_count is None:
+                    logger.warning(
+                        f"No historical data at all for {station.station_id}. Skipping."
+                    )
+                    continue  # Skip this station if there is NO history at all
 
-            # --- FALLBACK STRATEGY ---
-            # If API MMM failed to deliver yesterday's data (latency), we impute with J-7
-            # Assumption: Traffic today is likely similar to traffic same day last week
-            if val_lag_1 is None:
-                # logger.warning(f"Lag-1 missing for {station.station_id}. Using Lag-7 as fallback.")
-                val_lag_1 = val_lag_7
+                fallback_value = most_recent_count.intensity
+                val_lag_1 = val_lag_1 if val_lag_1 is not None else fallback_value
+                val_lag_7 = val_lag_7 if val_lag_7 is not None else fallback_value
 
             # C. Build the row
             row = {

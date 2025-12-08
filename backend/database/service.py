@@ -144,6 +144,19 @@ class DatabaseService:
         )
         return result[0] if result else None
 
+    def get_most_recent_bike_count(self, station_id: str) -> Optional[BikeCount]:
+        """Retrieves the most recent bike count record for a station."""
+        try:
+            return (
+                self.session.query(BikeCount)
+                .filter(BikeCount.station_id == station_id)
+                .order_by(BikeCount.date.desc())
+                .first()
+            )
+        except SQLAlchemyError as e:
+            logger.error(f"Error fetching most recent count for {station_id}: {e}")
+            return None
+
     def save_prediction_single_with_context(
         self, pred_data: Dict, features_data: Dict
     ) -> bool:
