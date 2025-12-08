@@ -1,0 +1,1158 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation technique du pipeline de prédiction de trafic cyclable.">
+      
+      
+        <meta name="author" content="Loïc, Saleh, Gaëtan">
+      
+      
+        <link rel="canonical" href="https://github.com/loicgoi/Prediction_velo_Montpellier.git/ml/logique_predict_daily/">
+      
+      
+        <link rel="prev" href="../monitoring/">
+      
+      
+        <link rel="next" href="../../api_frontend/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Logique Prédiction J0 - Prévision Vélo Montpellier</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#documentation-technique-pipeline-de-prediction-j0" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Prévision Vélo Montpellier" class="md-header__button md-logo" aria-label="Prévision Vélo Montpellier" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Prévision Vélo Montpellier
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Logique Prédiction J0
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../pipelines/overview/" class="md-tabs__link">
+          
+  
+  
+  Pipelines ETL
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../features/" class="md-tabs__link">
+          
+  
+  
+  Machine Learning
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Logique Prédiction J0
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../api_frontend/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API & Frontend
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Prévision Vélo Montpellier" class="md-nav__button md-logo" aria-label="Prévision Vélo Montpellier" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Prévision Vélo Montpellier
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines ETL
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pipelines ETL
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipelines/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vue d'ensemble
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipelines/extract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecte (Extract)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipelines/load/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Base de Données (Load)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipelines/retraining/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Réentrainement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Machine Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Machine Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Préparation (Transform)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modélisation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logique Prédiction J0
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logique Prédiction J0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-fonctionnement-general-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Fonctionnement Général &amp; Séquence
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Fonctionnement Général &amp; Séquence">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagramme-de-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagramme de Séquence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-description-des-fichiers-impliques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Description des Fichiers Impliques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modifications-apportees-aux-fichiers-preexistants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modifications apportees aux Fichiers Preexistants
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-guide-de-demarrage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Guide de Demarrage
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_frontend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API & Frontend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-fonctionnement-general-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Fonctionnement Général &amp; Séquence
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Fonctionnement Général &amp; Séquence">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagramme-de-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagramme de Séquence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-description-des-fichiers-impliques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Description des Fichiers Impliques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-modifications-apportees-aux-fichiers-preexistants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Modifications apportees aux Fichiers Preexistants
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-guide-de-demarrage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Guide de Demarrage
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="documentation-technique-pipeline-de-prediction-j0">Documentation Technique : Pipeline de Prediction J0</h1>
+<h2 id="1-fonctionnement-general-sequence">1. Fonctionnement Général &amp; Séquence</h2>
+<p>Ce pipeline a pour but de predire le trafic cyclable de la journée en cours (J0) pour l'ensemble des stations.
+C'est un processus de type Batch (traitement par lot) conçu pour être exécuté chaque matin.</p>
+<p><strong>La logique "Miroir"</strong></p>
+<p>Contrairement a l'entrainement ou l'on dispose d'un historique continu, la prediction a J0 nécessite de reconstruire artificiellement une ligne de données pour chaque station en assemblant des informations éparses :</p>
+<p><strong>Le Futur (Meteo) :</strong> On récupère les prévisions pour aujourd'hui.</p>
+<p><strong>Le Passé (Lags) :</strong> On interroge la base de données pour retrouver les valeurs d'hier (J-1) et de la semaine dernière (J-7).</p>
+<h3 id="diagramme-de-sequence">Diagramme de Séquence</h3>
+<p>Ce schema illustre les interactions entre l'orchestrateur et les differents modules.</p>
+<pre class="mermaid"><code>
+sequenceDiagram
+    autonumber
+    participant Orchestrator as daily_prediction.py
+    participant API_Weather as API Météo (Daily)
+    participant DB as Database Service
+    participant FeatureEng as Feature Engineering
+    participant Predictor as Traffic Predictor
+
+    Note over Orchestrator: Démarrage du Batch J0
+
+    %% Étape 1 : Météo
+    Orchestrator-&gt;&gt;API_Weather: Récupérer Forecast (J0)
+    API_Weather--&gt;&gt;Orchestrator: Température, Pluie, Vent
+
+    %% Étape 2 : Construction du Dataset
+    Orchestrator-&gt;&gt;DB: Récupérer liste des stations
+
+    loop Pour chaque station
+        Orchestrator-&gt;&gt;DB: Get Trafic J-1 (Lag 1)
+        Orchestrator-&gt;&gt;DB: Get Trafic J-7 (Lag 7)
+
+        alt Donnée J-1 manquante ?
+            Orchestrator-&gt;&gt;Orchestrator: Fallback : utiliser J-7
+        end
+
+        Orchestrator-&gt;&gt;Orchestrator: Assemblage ligne (Station + Météo + Lags)
+    end
+
+    %% Étape 3 : Transformation
+    Orchestrator-&gt;&gt;FeatureEng: Calculer Features (Dates, Seuils météo)
+    Note right of FeatureEng: Aucun shift() • Lags déjà injectés
+    FeatureEng--&gt;&gt;Orchestrator: DataFrame prêt
+
+    %% Étape 4 : Prédiction
+    Orchestrator-&gt;&gt;Predictor: Predict Batch
+    Predictor--&gt;&gt;Orchestrator: Valeurs prédites
+
+    %% Étape 5 : Sauvegarde
+    loop Pour chaque résultat
+        Orchestrator-&gt;&gt;Orchestrator: Convertir contexte en JSON
+        Orchestrator-&gt;&gt;DB: Sauvegarder (Prédiction + JSON)
+    end
+</code></pre>
+<h2 id="2-description-des-fichiers-impliques">2. Description des Fichiers Impliques</h2>
+<p><strong>Nouveaux Fichiers (Crees pour cette feature)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Fichier</th>
+<th>Emplacement</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>daily_prediction.py</strong></td>
+<td>backend/pipelines/</td>
+<td>Orchestrateur. Coordonne API, BDD, feature engineering et modèle.</td>
+</tr>
+<tr>
+<td><strong>predictor.py</strong></td>
+<td>backend/modeling/</td>
+<td>Moteur d’inférence chargé du modèle <code>.pkl</code> et du batch processing.</td>
+</tr>
+<tr>
+<td><strong>weather_utils.py</strong></td>
+<td>backend/pipelines/</td>
+<td>Extraction et nettoyage des valeurs météo quotidiennes du SDK OpenMeteo.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fichiers modifiés</strong></p>
+<table>
+<thead>
+<tr>
+<th>Fichier</th>
+<th>Emplacement</th>
+<th>Utilité</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>daily_weather_api.py</strong></td>
+<td>backend/download/</td>
+<td>Récupération de la météo du jour.</td>
+</tr>
+<tr>
+<td><strong>features_engineering.py</strong></td>
+<td>backend/features/</td>
+<td>Transformation dates et météo.</td>
+</tr>
+<tr>
+<td><strong>service.py</strong></td>
+<td>backend/database/</td>
+<td>Lecture des lags et écriture des prédictions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-modifications-apportees-aux-fichiers-preexistants">3. Modifications apportees aux Fichiers Preexistants</h2>
+<p>Pour permettre le bon fonctionnement du pipeline, le fichier backend/database/service.py a du évoluer :</p>
+<p><strong>Ajout de méthodes de Lecture (GET) :</strong></p>
+<p>get_all_stations() : Pour savoir sur qui prédire.</p>
+<p>get_bike_count(station_id, date) : Pour aller chercher précisemment la valeur du passé nécessaire aux Lags.</p>
+<p><strong>Ajout d'une méthode d'Ecriture Transactionnelle (POST) :</strong></p>
+<p>save_prediction_single_with_context(...) : Cette méthode sauvegarde la prediction ET son contexte JSON en une seule transaction atomique. Elle utilise un .flush() pour garantir que le lien (Cle Etrangere) entre la prediction et ses features est correct.</p>
+<p>Le fichier backend/main.py a egalement ete modifie pour ajouter l'option 10 au menu principal.</p>
+<h2 id="4-guide-de-demarrage">4. Guide de Demarrage</h2>
+<p><strong>Prerequis Techniques</strong></p>
+<p><em>Avant de lancer la prediction J0, le systeme doit etre dans l'etat suivant :</em></p>
+<ul>
+<li>
+<p>Base de données initialisée : Les tables doivent exister.</p>
+</li>
+<li>
+<p>Données présentes : La table bike_count doit contenir des données pour J-1 et J-7. Si la base est vide, le pipeline s'arretera (sécurité).</p>
+</li>
+<li>
+<p>Modèles entraînés : Les fichiers xgboost_v1.pkl et preprocessor_v1.pkl doivent etre presents dans backend/data/models/.</p>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "search.suggest"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
