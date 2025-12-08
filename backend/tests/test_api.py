@@ -84,7 +84,7 @@ def test_trigger_daily_update(client: TestClient):
         assert response.status_code == 202
         assert response.json() == {
             "status": "daily_update_started",
-            "message": "La mise à jour des données de J-1 a été lancée en arrière-plan.",
+            "message": "Daily update started in background.",
         }
 
         # Assert: Check that our background task function was called exactly once.

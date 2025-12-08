@@ -79,7 +79,15 @@ def test_insert_data_to_db(db_session):
 
     # The 'patch' ensures that any call to DatabaseManager() inside the 'with' block
     # will return our mock_db_manager instead of creating a real one.
-    with patch("pipelines.data_insertion.db_manager", mock_db_manager):
+    with (
+        patch("pipelines.data_insertion.db_manager", mock_db_manager),
+        patch(
+            "pipelines.data_insertion.get_street_name_from_coords"
+        ) as mock_get_street_name,
+    ):
+        # Configure the mock to prevent external API calls and return a predictable value.
+        # This makes the test self-contained and deterministic.
+        mock_get_street_name.return_value = "Counter Two"
         # Act: Call the function to be tested. The function will now use the mocked db_manager.
         insert_data_to_db(df_trafic, df_weather, df_metadata)
 
