@@ -33,7 +33,7 @@ nav:
       - Réentrainement: pipelines/retraining.md
   - Machine Learning:
       - Préparation (Transform): ml/features.md
-      - Logique Prédiction J0: ml/logique_predict_daily.md
+      - Logique Prédiction J0: ml/logic_predict_daily.md
       - Modélisation: ml/modeling.md
       - Monitoring: ml/monitoring.md
   - Interface: interface/frontend_overview.md
