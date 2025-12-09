@@ -34,7 +34,7 @@ nav:
       - Préparation (Transform): ml/features.md
       - Modélisation: ml/modeling.md
       - Monitoring: ml/monitoring.md
-  - Interface: frontend_overview.md
+  - Interface: interface/frontend_overview.md
 
 # --- AJOUT : Extensions Markdown pour Mermaid ---
 markdown_extensions:
