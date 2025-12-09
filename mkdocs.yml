@@ -3,11 +3,9 @@ site_url: https://github.com/loicgoi/Prediction_velo_Montpellier.git
 site_author: Loïc, Saleh, Gaëtan
 site_description: Documentation technique du pipeline de prédiction de trafic cyclable.
 
-
 theme:
   name: material
-  palette: 
-   
+  palette:
     scheme: slate
     primary: teal
     accent: cyan
@@ -20,24 +18,23 @@ theme:
 # Les plugins indispensables
 plugins:
   - search
-  - mkdocstrings: 
+  - mkdocstrings:
       handlers:
         python:
-          paths: [backend] 
-
+          paths: [backend]
 
 nav:
   - Accueil: index.md
   - Architecture: architecture.md
   - Pipelines ETL:
-    - Vue d'ensemble: pipelines/overview.md
-    - Collecte (Extract): pipelines/extract.md
-    - Base de Données (Load): pipelines/load.md
+      - Vue d'ensemble: pipelines/overview.md
+      - Collecte (Extract): pipelines/extract.md
+      - Base de Données (Load): pipelines/load.md
   - Machine Learning:
-    - Préparation (Transform): ml/features.md
-    - Modélisation: ml/modeling.md
-    - Monitoring: ml/monitoring.md
-  - API & Frontend: api_frontend.md
+      - Préparation (Transform): ml/features.md
+      - Modélisation: ml/modeling.md
+      - Monitoring: ml/monitoring.md
+  - Interface: frontend_overview.md
 
 # --- AJOUT : Extensions Markdown pour Mermaid ---
 markdown_extensions:
