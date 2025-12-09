@@ -142,6 +142,68 @@ Les performances du modèle sont stockées quotidiennement dans la table model_m
 
 **Ré-entraînement** : Le pipeline model_training.py peut être lancé (via main.py) pour mettre à jour le modèle avec les dernières données, incluant les nouveaux compteurs installés.
 
+## Guide d'installation
+
+### Accès production (Azure)
+
+- **Interface** : https://pred-vel-mtp-front-gfd6gkgsdrdshvhc.francecentral-01.azurewebsites.net/
+- **Documentation API** : https://velo-pred-mtp-back-bzbmghezh7ergzhs.francecentral-01.azurewebsites.net/docs
+
+### Accès local
+
+1. **Prérequis**
+    - Git
+    - Docker Desktop
+
+2. Configuration des variables d'environnement
+   - Créer un .env
+   - Rajouter les informations suivantes
+
+```
+# Connexion à la base de données
+DATABASE_URL="<lien_vers_votre_bdd>"
+
+# Configuration API locale
+API_BASE_URL="http://backend:8000"
+WEBSITES_PORT=8000
+```
+
+3. **Lancement des conteneurs**
+
+   - Utilisation de ```docker compose``` pour le lancement des 4 services (backend, frontend, Prometheus, Grafana)
+
+```
+docker compose up --build -d
+```
+
+4. ** Initialisation du projet (premier lancement)
+
+```
+docker compose exec backend main_initialize.py
+```
+
+*Le script lance* :
+    - La création de votre base de données.
+    - Le téléchargement de l'historique du trafic cyclable depuis 2023.
+    - La récupération des données météo depuis 2023.
+    - Le traitement des données (nettoyage, preprocessing)
+    - L'entraînement premier du modèle (XGBoost)
+
+5. **Accéder aux services**
+
+| Service | URL | Description | Identifiants (si requis) |
+| :--- | :--- | :--- | :--- |
+| **Frontend** | [http://localhost:8080](http://localhost:8080) | Interface utilisateur NiceGUI | - |
+| **API Docs** | [http://localhost:8000/docs](http://localhost:8000/docs) | Swagger UI du Backend | - |
+| **Prometheus** | [http://localhost:9090](http://localhost:9090) | Collecte des métriques | - |
+| **Grafana** | [http://localhost:3000](http://localhost:3000) | Dashboard de monitoring technique | `admin` / `admin` |
+
+6. Arrêt de l'application
+
+```
+docker compose down
+```
+
 ## Modèle C4
 
 ### 1. Diagramme de Contexte
