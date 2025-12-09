@@ -2,46 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/</loc>
-         <lastmod>2025-12-08</lastmod>
-    </url>
-    <url>
-         <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/api_frontend/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
     </url>
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/architecture/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/interface/frontend_overview/</loc>
+         <lastmod>2025-12-09</lastmod>
     </url>
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/ml/features/</loc>
-         <lastmod>2025-12-08</lastmod>
-    </url>
-    <url>
-         <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/ml/logique_predict_daily/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
     </url>
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/ml/modeling/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
     </url>
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/ml/monitoring/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
     </url>
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/pipelines/extract/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
     </url>
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/pipelines/load/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
     </url>
     <url>
          <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/pipelines/overview/</loc>
-         <lastmod>2025-12-08</lastmod>
-    </url>
-    <url>
-         <loc>https://github.com/loicgoi/Prediction_velo_Montpellier.git/pipelines/retraining/</loc>
-         <lastmod>2025-12-08</lastmod>
+         <lastmod>2025-12-09</lastmod>
     </url>
 </urlset>
