@@ -12,11 +12,13 @@
         <meta name="author" content="Loïc, Saleh, Gaëtan">
       
       
-        <link rel="canonical" href="https://github.com/loicgoi/Prediction_velo_Montpellier.git/interface/frontend_overview/">
+        <link rel="canonical" href="https://github.com/loicgoi/Prediction_velo_Montpellier.git/pipelines/retraining/">
       
       
-        <link rel="prev" href="../../ml/monitoring/">
+        <link rel="prev" href="../load/">
       
+      
+        <link rel="next" href="../../ml/features/">
       
       
         
@@ -27,7 +29,7 @@
     
     
       
-        <title>Interface - Prévision Vélo Montpellier</title>
+        <title>Réentrainement - Prévision Vélo Montpellier</title>
       
     
     
@@ -78,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#documentation-de-linterface-utilisateur-frontend" class="md-skip">
+        <a href="#pipeline-de-reentrainement-mensuel" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Interface
+              Réentrainement
             
           </span>
         </div>
@@ -223,11 +225,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../pipelines/overview/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
           
   
   
@@ -263,11 +267,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../../interface/frontend_overview/" class="md-tabs__link">
         
   
   
@@ -371,26 +373,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -408,7 +415,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -426,7 +433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pipelines/overview/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -454,7 +461,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pipelines/extract/" class="md-nav__link">
+      <a href="../extract/" class="md-nav__link">
         
   
   
@@ -482,7 +489,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pipelines/load/" class="md-nav__link">
+      <a href="../load/" class="md-nav__link">
         
   
   
@@ -507,10 +514,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../pipelines/retraining/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Réentrainement
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -526,6 +560,98 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objectif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#declencheurs-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Déclencheurs (Triggers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flux-de-donnees-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flux de Données (Workflow)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flux de Données (Workflow)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#diagramme-de-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagramme de Séquence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fichiers-impliques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fichiers Impliqués
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#points-de-vigilance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Points de Vigilance
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -713,37 +839,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Interface
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../interface/frontend_overview/" class="md-nav__link">
         
   
   
@@ -759,137 +858,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#1-vue-densemble" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Vue d'ensemble
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-architecture-et-structure-des-fichiers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Architecture et Structure des Fichiers
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="2. Architecture et Structure des Fichiers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#architecture-des-composants" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Architecture des Composants
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-fonctionnalites-detaillees" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Fonctionnalités Détaillées
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. Fonctionnalités Détaillées">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#layout-principal-et-gestion-de-letat-apppy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Layout Principal et Gestion de l'État (app.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#affichage-du-contenu-componentspy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Affichage du Contenu (components.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#couche-de-donnees-robuste-datapy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Couche de Données Robuste (data.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#visualisations-claires-plotspy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visualisations Claires (plots.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-lancement-de-lapplication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Lancement de l'Application
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -921,10 +889,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-vue-densemble" class="md-nav__link">
+  <a href="#objectif" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Vue d'ensemble
+        Objectif
       
     </span>
   </a>
@@ -932,22 +900,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-architecture-et-structure-des-fichiers" class="md-nav__link">
+  <a href="#declencheurs-triggers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Architecture et Structure des Fichiers
+        Déclencheurs (Triggers)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="2. Architecture et Structure des Fichiers">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flux-de-donnees-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flux de Données (Workflow)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flux de Données (Workflow)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#architecture-des-composants" class="md-nav__link">
+  <a href="#diagramme-de-sequence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Architecture des Composants
+        Diagramme de Séquence
       
     </span>
   </a>
@@ -960,71 +939,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-fonctionnalites-detaillees" class="md-nav__link">
+  <a href="#fichiers-impliques" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Fonctionnalités Détaillées
+        Fichiers Impliqués
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="3. Fonctionnalités Détaillées">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#layout-principal-et-gestion-de-letat-apppy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Layout Principal et Gestion de l'État (app.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#affichage-du-contenu-componentspy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Affichage du Contenu (components.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#couche-de-donnees-robuste-datapy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Couche de Données Robuste (data.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#visualisations-claires-plotspy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visualisations Claires (plots.py)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-lancement-de-lapplication" class="md-nav__link">
+  <a href="#points-de-vigilance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Lancement de l'Application
+        Points de Vigilance
       
     </span>
   </a>
@@ -1048,93 +977,122 @@
 
 
 
-<h1 id="documentation-de-linterface-utilisateur-frontend">Documentation de l'Interface Utilisateur (Frontend)</h1>
-<p>Cette page décrit l'architecture, les fonctionnalités et la logique de l'interface utilisateur (frontend) du projet, développée avec le framework <strong>NiceGUI</strong>.</p>
-<h2 id="1-vue-densemble">1. Vue d'ensemble</h2>
-<p>L'interface utilisateur a pour but de fournir une visualisation interactive et en temps réel des données de comptage de vélos à Montpellier. Elle permet aux utilisateurs de :
-- Consulter les prédictions de trafic pour le jour même.
-- Analyser les performances des prédictions passées.
-- Explorer les tendances historiques et les profils d'utilisation de chaque compteur.</p>
-<h2 id="2-architecture-et-structure-des-fichiers">2. Architecture et Structure des Fichiers</h2>
-<p>Le frontend est organisé en modules clairs, chacun ayant une responsabilité unique, ce qui facilite la maintenance et l'évolution de l'application.</p>
-<ul>
-<li>
-<p><code>app.py</code>: <strong>Point d'entrée principal.</strong> Il initialise l'application, définit la structure de la page (header, layout) et gère l'état global comme la sélection du compteur.</p>
-</li>
-<li>
-<p><code>components.py</code>: <strong>Cœur de l'affichage dynamique.</strong> Contient la logique pour afficher les KPIs, les cartes et les graphiques pour un compteur donné. Ce composant est "rafraîchissable" pour des mises à jour fluides.</p>
-</li>
-<li>
-<p><code>data.py</code>: <strong>Couche d'accès aux données.</strong> Centralise toute la communication avec les APIs externes (le backend du projet et l'API météo). Il est conçu pour être robuste et configurable.</p>
-</li>
-<li>
-<p><code>plots.py</code>: <strong>Module de visualisation.</strong> Regroupe toutes les fonctions qui génèrent les graphiques avec Matplotlib, assurant une séparation nette entre la logique de données et la présentation visuelle.</p>
-</li>
-</ul>
-<h3 id="architecture-des-composants">Architecture des Composants</h3>
-<pre class="mermaid"><code>graph TD
-    User((Utilisateur)) --&gt; App["app.py\nPoint d'entrée"]
-    App --&gt; DataLayer["data.py\nConnecteur API"]
-    App --&gt; Components["components.py\nMise en page &amp; KPIs"]
-    Components --&gt; Plots["plots.py\nGénération Graphiques"]
-
-    DataLayer -- "HTTP GET" --&gt; Backend["Backend FastAPI"]
-    DataLayer -- "HTTP GET" --&gt; OpenMeteo["API Météo (Temps réel)"]</code></pre>
-<h2 id="3-fonctionnalites-detaillees">3. Fonctionnalités Détaillées</h2>
-<h3 id="layout-principal-et-gestion-de-letat-apppy">Layout Principal et Gestion de l'État (<code>app.py</code>)</h3>
-<p>L'application est construite autour d'une page unique avec une mise en page réactive.</p>
-<ul>
-<li><strong>Header Persistant</strong> : Un en-tête contient le titre de l'application et un sélecteur (<code>ui.select</code>) permettant de choisir une station de comptage.</li>
-<li><strong>Gestion de l'État Client</strong> : L'application utilise <code>app.storage.client</code> pour mémoriser la station sélectionnée par l'utilisateur. Cela garantit que si l'utilisateur rafraîchit la page, sa dernière sélection est conservée, améliorant l'expérience utilisateur.</li>
-<li><strong>Rafraîchissement Dynamique</strong> : Lorsque l'utilisateur change de station, l'événement <code>on_change</code> du sélecteur appelle la méthode <code>.refresh()</code> du composant <code>render_counter_content</code>. Cela met à jour uniquement la partie centrale de la page, sans rechargement complet.</li>
-</ul>
-<h3 id="affichage-du-contenu-componentspy">Affichage du Contenu (<code>components.py</code>)</h3>
-<p>La fonction <code>@ui.refreshable render_counter_content</code> est le moteur de l'interface.</p>
-<ul>
-<li>
-<p><strong>Gestion des Données Obsolètes ou Manquantes</strong> : Une des fonctionnalités clés est la capacité à informer l'utilisateur de l'état des données.</p>
-<ul>
-<li>Si la prédiction affichée ne date pas du jour même, un bandeau d'avertissement <strong>orange</strong> est affiché.</li>
-<li>Si aucune prédiction n'est disponible pour un compteur, un bandeau d'erreur <strong>rouge</strong> l'indique clairement.
-Cela rend l'application transparente sur la fraîcheur des informations qu'elle présente.</li>
-</ul>
-</li>
-<li>
-<p><strong>Navigation par Onglets</strong> : Le contenu est organisé en deux onglets pour une meilleure clarté :</p>
+<h1 id="pipeline-de-reentrainement-mensuel">Pipeline de Réentrainement Mensuel</h1>
+<h2 id="objectif">Objectif</h2>
+<p>Le trafic cyclable évolue : de nouvelles pistes ouvrent, les habitudes changent, et de nouveaux compteurs sont installés. Un modèle entrainé en 2023 sera moins performant en 2025.</p>
+<p>Ce pipeline a pour but de <strong>régénérer automatiquement</strong> les fichiers du modèle (<code>xgboost_v1.pkl</code> et <code>preprocessor_v1.pkl</code>) en utilisant <strong>l'integralité de l'historique disponible</strong> en base de données au moment de l'exécution.</p>
+<h2 id="declencheurs-triggers">Déclencheurs (Triggers)</h2>
+<p>Le processus peut être lancé de deux manières :</p>
 <ol>
-<li><strong>Tableau de Bord</strong> : Affiche les informations essentielles en un coup d'œil (KPIs, carte, météo).</li>
-<li><strong>Analyses &amp; Stats</strong> : Regroupe les graphiques d'analyse historique.</li>
+<li><strong>Automatique (Planifié) :</strong></li>
+<li><strong>Fréquence :</strong> Le 1er de chaque mois a 02h00 du matin.</li>
+<li>
+<p><strong>Composant :</strong> <code>backend/core/scheduler.py</code> (APScheduler).</p>
+</li>
+<li>
+<p><strong>Manuel (Administration) :</strong></p>
+</li>
+<li><strong>Action :</strong> Requête POST sur l'endpoint <code>/api/train</code>.</li>
+<li><strong>Mecanisme :</strong> Utilisation de <code>BackgroundTasks</code> FastAPI pour ne pas bloquer la reponse HTTP.</li>
 </ol>
-</li>
-</ul>
-<h3 id="couche-de-donnees-robuste-datapy">Couche de Données Robuste (<code>data.py</code>)</h3>
-<p>Ce module est conçu pour être à la fois flexible et résilient.</p>
-<ul>
+<h2 id="flux-de-donnees-workflow">Flux de Données (Workflow)</h2>
+<p>Le processus est orchestré par le module <code>training_orchestrator.py</code>. Voici les étapes séquentielles :</p>
+<ol>
+<li><strong>Extraction (SQL -&gt; Pandas) :</strong></li>
+<li>Récuperation de tout l'historique <code>bike_count</code> (Target).</li>
+<li>Récuperation de tout l'historique <code>weather</code> (Features contextuelles).</li>
+<li>Récuperation du reférentiel <code>counters_info</code> (Lat/Lon).</li>
 <li>
-<p><strong>Configuration Intelligente de l'URL de l'API</strong> : La fonction <code>_get_api_url</code> détecte automatiquement l'environnement d'exécution (variable d'environnement pour la production, présence de <code>/.dockerenv</code> pour Docker, ou <code>localhost</code> pour le développement local). Cela permet de déployer l'application dans différents contextes sans aucune modification du code.</p>
+<p><strong>Fusion :</strong> Merge des trois sources en un seul DataFrame cohérent.</p>
 </li>
 <li>
-<p><strong>Mise en Cache Efficace</strong> : La liste des compteurs est récupérée une seule fois et stockée dans <code>_COUNTERS_CACHE</code>. Cela évite des appels réseau inutiles et accélère les chargements ultérieurs de la page.</p>
+<p><strong>Transformation (Feature Engineering) :</strong></p>
+</li>
+<li>Nettoyage des donnees (calcul de <code>avg_temp</code> si manquant).</li>
+<li>Suppression des compteurs suspects ("Blacklist").</li>
+<li>Création des variables temporelles, cycliques et météorologiques.</li>
+<li>
+<p>Création des Lags (J-1, J-7).</p>
 </li>
 <li>
-<p><strong>Gestion des Erreurs d'API</strong> : La fonction <code>get_dashboard_data</code> est encapsulée dans un bloc <code>try...except</code>. En cas d'échec de la connexion à l'API (timeout, erreur 500, etc.), elle ne fait pas planter l'application. Au lieu de cela, elle retourne une structure de données "vide" mais valide. Cela permet à l'interface de rester fonctionnelle et d'afficher un état dégradé propre au lieu d'une page d'erreur.</p>
+<p><strong>Entrainement &amp; Sauvegarde :</strong></p>
 </li>
-</ul>
-<h3 id="visualisations-claires-plotspy">Visualisations Claires (<code>plots.py</code>)</h3>
-<p>Ce module isole complètement la logique de création des graphiques.</p>
-<ul>
-<li><strong>Modularité</strong> : Chaque graphique (tendance 30 jours, fiabilité 7 jours, etc.) est généré par sa propre fonction.</li>
-<li><strong>Style Cohérent</strong> : Une fonction <code>apply_dashboard_style</code> est utilisée pour appliquer un style visuel commun à tous les graphiques, garantissant une apparence professionnelle et homogène.</li>
-<li><strong>Gestion des Données Vides</strong> : Chaque fonction de plot vérifie si les données d'entrée sont valides et fournit des valeurs par défaut si nécessaire, ce qui contribue à la robustesse générale de l'affichage.</li>
-</ul>
-<h2 id="4-lancement-de-lapplication">4. Lancement de l'Application</h2>
-<p>L'application est lancée via la commande <code>ui.run()</code> à la fin du fichier <code>app.py</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ui</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Vélo Montpellier IA&quot;</span><span class="p">,</span> <span class="n">favicon</span><span class="o">=</span><span class="s2">&quot;🚴&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ul>
-<li><code>host="0.0.0.0"</code> rend l'application accessible sur le réseau (essentiel pour Docker).</li>
-<li><code>port=8080</code> est le port d'écoute par défaut.</li>
-</ul>
+<li>Le Dataset prépare est envoyé au pipeline d'entrainement (<code>model_training.py</code>).</li>
+<li>Le modèle est entraine sur 100% des données (pas de split de test en mode production).</li>
+<li>Les artefacts <code>.pkl</code> sont écrasés dans le dossier <code>backend/data/models/</code>.</li>
+</ol>
+<h3 id="diagramme-de-sequence">Diagramme de Séquence</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant Scheduler as Scheduler / API
+    participant Orch as Training Orchestrator
+    participant DB as Database
+    participant Feature as Feature Engineer
+    participant Trainer as Model Trainer
+    participant Storage as Disk (Models)
+
+    Note over Scheduler: Declenchement (1er du mois ou POST /train)
+
+    Scheduler-&gt;&gt;Orch: run_model_training()
+
+    rect rgb(240, 248, 255)
+        Note right of Orch: 1. Chargement des Donnees
+        Orch-&gt;&gt;DB: SELECT * FROM bike_count
+        Orch-&gt;&gt;DB: SELECT * FROM weather
+        Orch-&gt;&gt;DB: SELECT * FROM counters_info
+        DB--&gt;&gt;Orch: DataFrames bruts
+        Orch-&gt;&gt;Orch: Merge DataFrames
+    end
+
+    rect rgb(255, 250, 240)
+        Note right of Orch: 2. Feature Engineering
+        Orch-&gt;&gt;Feature: Instanciation
+        Feature-&gt;&gt;Feature: Nettoyage + Creation Variables
+        Feature--&gt;&gt;Orch: Dataset Final (X, y)
+    end
+
+    rect rgb(240, 255, 240)
+        Note right of Orch: 3. Entrainement
+        Orch-&gt;&gt;Trainer: train_model_pipeline(df)
+        Trainer-&gt;&gt;Trainer: Preprocessing.fit()
+        Trainer-&gt;&gt;Trainer: XGBoost.train()
+        Trainer-&gt;&gt;Storage: Overwrite .pkl files
+    end
+
+    Orch--&gt;&gt;Scheduler: Succes (Logs)</code></pre>
+<h2 id="fichiers-impliques">Fichiers Impliqués</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Fichier</th>
+<th style="text-align: left;">Rôle Technique</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><code>core/scheduler.py</code></strong></td>
+<td style="text-align: left;">Configure la tache CRON (<code>APScheduler</code>) qui tourne en arrière-plan de l'API. Définit l'heure et la fréquence.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>api/endpoints.py</code></strong></td>
+<td style="text-align: left;">Expose la route POST <code>/train</code> et incremente les metriques Prometheus (<code>training_started_total</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>core/training_orchestrator.py</code></strong></td>
+<td style="text-align: left;"><strong>Le chef de chantier.</strong> Il fait le lien entre la base de données brute et le pipeline d'entrainement technique. Il gere la logique de fusion des tables SQL.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>pipelines/model_training.py</code></strong></td>
+<td style="text-align: left;">Le script technique qui contient la logique Scikit-Learn/XGBoost (Fit, GridSearch, Save).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="points-de-vigilance">Points de Vigilance</h2>
+<ol>
+<li><strong>Temps d'exécution :</strong> Ce processus peut etre long (plusieurs minutes). C'est pourquoi il est exécute de manière asynchrone (Background Task) pour ne pas bloquer l'API.</li>
+<li><strong>Disponibilité des données :</strong> Si la base de données est vide ou si la meteo est manquante, l'orchestrateur avorte le processus (<code>Aborting training</code>) pour ne pas écraser un bon modèle par un modèle vide.</li>
+<li><strong>Redemarrage du Serveur :</strong> Le scheduler est configuré avec <code>replace_existing=True</code>. Si le serveur redémarre, la tache planifiée est correctement réenregistrée.</li>
+</ol>
 
 
 
