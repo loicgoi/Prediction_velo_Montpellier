@@ -30,8 +30,10 @@ nav:
       - Vue d'ensemble: pipelines/overview.md
       - Collecte (Extract): pipelines/extract.md
       - Base de Données (Load): pipelines/load.md
+      - Réentrainement: pipelines/retraining.md
   - Machine Learning:
       - Préparation (Transform): ml/features.md
+      - Logique Prédiction J0: ml/logique_predict_daily.md
       - Modélisation: ml/modeling.md
       - Monitoring: ml/monitoring.md
   - Interface: interface/frontend_overview.md

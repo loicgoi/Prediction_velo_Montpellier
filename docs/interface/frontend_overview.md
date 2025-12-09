@@ -21,6 +21,19 @@ Le frontend est organisé en modules clairs, chacun ayant une responsabilité un
 
 -   `plots.py`: **Module de visualisation.** Regroupe toutes les fonctions qui génèrent les graphiques avec Matplotlib, assurant une séparation nette entre la logique de données et la présentation visuelle.
 
+### Architecture des Composants
+
+```mermaid
+graph TD
+    User((Utilisateur)) --> App["app.py\nPoint d'entrée"]
+    App --> DataLayer["data.py\nConnecteur API"]
+    App --> Components["components.py\nMise en page & KPIs"]
+    Components --> Plots["plots.py\nGénération Graphiques"]
+
+    DataLayer -- "HTTP GET" --> Backend["Backend FastAPI"]
+    DataLayer -- "HTTP GET" --> OpenMeteo["API Météo (Temps réel)"]
+```
+
 ## 3. Fonctionnalités Détaillées
 
 ### Layout Principal et Gestion de l'État (`app.py`)
