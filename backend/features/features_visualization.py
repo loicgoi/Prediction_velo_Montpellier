@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import holidays
+from utils.paths import OUTPUT_PATH
 
 # Display settings
 sns.set_context("notebook", font_scale=1.0)
@@ -217,3 +218,11 @@ class FeaturesVisualization:
         self.plot_spatial_features()
         self.plot_station_effect()
         self.plot_correlation_heatmap()
+
+
+if __name__ == "__main__":
+    # Load your dataset here
+    df = pd.read_csv(OUTPUT_PATH / "dataset_final.csv")
+
+    viz = FeaturesVisualization(df)
+    viz.show_all_plots()

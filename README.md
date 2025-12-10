@@ -1,10 +1,39 @@
 # Projet Prédiction du trafic cyclable de la métropole de Montpellier
 
-![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.121.2-green.svg)
-![NiceGUI](https://img.shields.io/badge/NiceGUI-2.0+-orange.svg)
-![Docker](https://img.shields.io/badge/Docker-4.49-cyan.svg)
-![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4.svg)
+- **Langages & Frameworks**
+
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688?style=flat&logo=fastapi&logoColor=white)
+![NiceGUI](https://img.shields.io/badge/NiceGUI-1.4+-orange?style=flat)
+
+- **ML & Data Science**
+
+![Pandas](https://img.shields.io/badge/Pandas-2.0+-150458?style=flat&logo=pandas&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-Optimization-EB4C42?style=flat&logo=xgboost&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
+
+- **Base de données & Backend**
+
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red?style=flat&logo=sqlalchemy&logoColor=white)
+![Azure SQL](https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927?style=flat&logo=microsoft-sql-server&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-Validation-E92063?style=flat&logo=pydantic&logoColor=white)
+
+- **DevOps & Cloud**
+
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=flat&logo=docker&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4?style=flat&logo=microsoft-azure&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=flat&logo=github-actions&logoColor=white)
+
+- **Monitoring**
+
+![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=flat&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-Dashboard-F46800?style=flat&logo=grafana&logoColor=white)
+
+- **Tests & Qualité**
+
+![Pytest](https://img.shields.io/badge/Pytest-Tests-0A9EDC?style=flat&logo=pytest&logoColor=white)
+![MkDocs](https://img.shields.io/badge/MkDocs-Documentation-526CFE?style=flat&logo=material-for-mkdocs&logoColor=white)
 
 ## A propos
 
@@ -25,75 +54,73 @@ Le projet est divisé en deux blocs principaux conteneurisés via Docker :
 backend/
 ├── api/                            # Couche d'exposition (API REST)
 │   ├── api.py                      # Point d'entree de l'application FastAPI
-│   ├── endpoints.py                # Definition des routes (GET /predict, etc.)
+│   ├── endpoints.py                # Définition des routes (GET /predict, etc.)
 │   └── server.py                   # Configuration du serveur Uvicorn/Gunicorn
 ├── core/                           # Configuration coeur
 │   ├── dependencies.py             # Gestion des instances (Singleton BDD)
-│   └── training.py                 # Constantes liees a l'entrainement
+│   └── training.py                 # Constantes liées a l'entraînement
 ├── data/                           # Stockage local (Volume Docker)
 │   ├── raw/                        # Fichiers CSV bruts temporaires
 │   ├── models/                     # Artefacts ML (fichiers .pkl)
-│   └── output/                     # Exports de donnees traitees
+│   └── output/                     # Exports de données traitées
 ├── database/                       # Couche de stockage
-│   ├── database.py                 # Modeles SQLAlchemy (Tables SQL)
-│   ├── fetch_prediction.py         # Requetes specifiques de lecture
+│   ├── database.py                 # Modèles SQLAlchemy (Tables SQL)
+│   ├── fetch_prediction.py         # Requêtes spécifiques de lecture
 │   └── service.py                  # CRUD complet (Create, Read, Update, Delete)
 ├── download/                       # Connecteurs aux APIs externes (Extract)
-│   ├── abstract_loader.py          # Classe mere abstraite pour les loaders
+│   ├── abstract_loader.py          # Classe mère abstraite pour les loaders
 │   ├── daily_weather_api.py        # Client API OpenMeteo (Previsions J0)
-│   ├── ecocounters_ids.py          # Recuperation de la liste des compteurs
+│   ├── ecocounters_ids.py          # Récuperation de la liste des compteurs
 │   ├── geocoding_service.py        # Service de conversion Adresse <-> GPS
 │   ├── trafic_history_api.py       # Client API EcoCompteur (Historique avec pagination)
 │   └── weeather_api.py             # Client API OpenMeteo (Archive historique)
-├── features/                       # Ingenierie des fonctionnalites (Transform)
-│   ├── features_engineering.py     # Transformation Donnee brute -> Variables ML
+├── features/                       # Ingénierie des fonctionnalités (Transform)
+│   ├── features_engineering.py     # Transformation Données brute -> Variables ML
 │   └── features_vizualization.py   # Outils graphiques pour analyser les features
 ├── modeling/                       # Coeur du Machine Learning
-│   ├── predictor.py                # Moteur d'inference (Charge le modele et predit)
+│   ├── predictor.py                # Moteur d'inférence (Charge le modele et predit)
 │   ├── preprocessor.py             # Transformation (Scaling, Encodage)
-│   └── trainer.py                  # Entrainement (GridSearch, CrossVal, Save)
-├── monitoring/                     # Suivi de la qualite
-│   └── performance.py              # Calcul des metriques (MAE, RMSE) reel vs predit
+│   └── trainer.py                  # Entraînement (GridSearch, CrossVal, Save)
+├── monitoring/                     # Suivi de la qualité
+│   └── performance.py              # Calcul des métriques (MAE, RMSE) reel vs predit
 ├── pipelines/                      # Scripts d'orchestration (Workflows)
 │   ├── daily_predictor.py          # Pipeline journalier : Prediction J0
 │   ├── daily_update.py             # Pipeline journalier : Mise a jour J-1 + Monitoring
-│   ├── data_insertion.py           # Logique d'insertion securisee en BDD
+│   ├── data_insertion.py           # Logique d'insertion securisée en BDD
 │   ├── initialize_project.py       # Script d'installation initiale (Historique complet)
-│   ├── model_training.py           # Pipeline de re-entrainement complet
-│   ├── pipeline.py                 # Menu interactif (CLI)
+│   ├── model_training.py           # Pipeline de ré-entraînement complet
 │   └── pipeline_visualization.py   # Generation de graphes pour le pipeline
 ├── src/                            # Utilitaires de traitement de donnees
-│   ├── api_data_processing.py      # Nettoyage specifique aux retours API
+│   ├── api_data_processing.py      # Nettoyage spécifique aux retours API
 │   ├── data_cleaner.py             # Fonctions de nettoyage (dedoublonnage, types)
-│   ├── data_exploration.py         # Classe pour generer des stats descriptives
+│   ├── data_exploration.py         # Classe pour générer des stats descriptives
 │   └── data_merger.py              # Logique de fusion (Merge Trafic + Meteo)
 ├── tests/                          # Tests unitaires et d'integration
 │   ├── conftest.py                 # Configuration Pytest (Fixtures)
 │   ├── test_api.py                 # Tests des endpoints API
 │   ├── test_data_insertion.py      # Tests des ecritures en BDD
-│   ├── test_database_service.py    # Tests des requetes SQL
-│   └── test_train.py               # Tests du pipeline d'entrainement
+│   ├── test_database_service.py    # Tests des requêtes SQL
+│   └── test_train.py               # Tests du pipeline d'entraînement
 ├── utils/                          # Outils transverses
-│   ├── logging_config.py           # Configuration centralisee des logs
+│   ├── logging_config.py           # Configuration centralisée des logs
 │   ├── paths.py                    # Gestion des chemins absolus
-│   └── weather_utils.py            # Parsing des reponses OpenMeteo
+│   └── weather_utils.py            # Parsing des réponses OpenMeteo
 ├── .dockerignore                   # Fichiers exclus du build Docker
-├── Dockerfile                      # Definition de l'image Backend
-├── main.py                         # Point d'entree CLI (Menu principal)
+├── Dockerfile                      # Définition de l'image Backend
+├── main.py                         # Point d'entrée CLI (Menu principal)
 ├── main_initialize.py              # Raccourci pour l'initialisation
-└── requirements.txt                # Dependances Python
+└── requirements.txt                # Dépendances Python
 frontend/
-├── app.py                          # Point d'entree de l'application Web
-├── components.py                   # Widgets graphiques reutilisables
-├── data.py                         # Connecteur pour recuperer les donnees du Backend
-├── plots.py                        # Fonctions de generation de graphiques
-├── requirements.txt                # Dependances Frontend
+├── app.py                          # Point d'entrée de l'application Web
+├── components.py                   # Widgets graphiques réutilisables
+├── data.py                         # Connecteur pour récuperer les données du Backend
+├── plots.py                        # Fonctions de génération de graphiques
+├── requirements.txt                # Dépendances Frontend
 ├── .dockerignore
 └── Dockerfile                      # Definition de l'image Frontend
 .gitignore                          # Fichiers exclus de Git
 README.md                           # Documentation du projet
 docker-compose.yml                  # Orchestration des conteneurs
-logique_predict_daily.md            # Doc specifique sur la logique J0
 prometheus.yml                      # Configuration monitoring infrastructure
 reset_db.py                         # Script utilitaire pour vider la base
 ```
@@ -134,7 +161,7 @@ Assure la fiabilité du système via des tests automatiques et un calcul quotidi
 
 - DevOps : Docker, GitHub Actions.
 
-- Monitoring : Prometheus.
+- Monitoring : Prometheus & Grafana.
 
 ## Monitoring & Maintenance
 
@@ -155,7 +182,7 @@ Les performances du modèle sont stockées quotidiennement dans la table model_m
     - Git
     - Docker Desktop
 
-2. Configuration des variables d'environnement
+2. **Configuration des variables d'environnement**
    - Créer un .env
    - Rajouter les informations suivantes
 
@@ -176,18 +203,20 @@ WEBSITES_PORT=8000
 docker compose up --build -d
 ```
 
-4. ** Initialisation du projet (premier lancement)
+4. **Initialisation du projet (premier lancement)**
 
 ```
 docker compose exec backend main_initialize.py
+
 ```
 
 *Le script lance* :
-    - La création de votre base de données.
-    - Le téléchargement de l'historique du trafic cyclable depuis 2023.
-    - La récupération des données météo depuis 2023.
-    - Le traitement des données (nettoyage, preprocessing)
-    - L'entraînement premier du modèle (XGBoost)
+
+- La création de votre base de données.
+- Le téléchargement de l'historique du trafic cyclable depuis 2023.
+- La récupération des données météo depuis 2023.
+- Le traitement des données (nettoyage, preprocessing)
+- L'entraînement premier du modèle (XGBoost)
 
 5. **Accéder aux services**
 
@@ -198,11 +227,13 @@ docker compose exec backend main_initialize.py
 | **Prometheus** | [http://localhost:9090](http://localhost:9090) | Collecte des métriques | - |
 | **Grafana** | [http://localhost:3000](http://localhost:3000) | Dashboard de monitoring technique | `admin` / `admin` |
 
-6. Arrêt de l'application
+6. **Arrêt de l'application**
 
 ```
 docker compose down
 ```
+
+*Pour plus de détails, veuillez consulter notre [documentation](https://loicgoi.github.io/Prediction_velo_Montpellier/).*
 
 ## Modèle C4
 
