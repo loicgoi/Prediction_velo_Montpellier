@@ -163,7 +163,7 @@ Assure la fiabilité du système via des tests automatiques et un calcul quotidi
 
 - DevOps : Docker, GitHub Actions.
 
-- Monitoring : Prometheus.
+- Monitoring : Prometheus & Grafana.
 
 ## Monitoring & Maintenance
 
@@ -232,6 +232,8 @@ docker compose exec backend main_initialize.py
 ```
 docker compose down
 ```
+
+*Pour plus de détails, veuillez consulter notre [documentation](https://loicgoi.github.io/Prediction_velo_Montpellier/).*
 
 ## Modèle C4
 
