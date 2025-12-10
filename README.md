@@ -1,10 +1,39 @@
 # Projet Prédiction du trafic cyclable de la métropole de Montpellier
 
-![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.121.2-green.svg)
-![NiceGUI](https://img.shields.io/badge/NiceGUI-2.0+-orange.svg)
-![Docker](https://img.shields.io/badge/Docker-4.49-cyan.svg)
-![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4.svg)
+- **Langages & Frameworks**
+
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688?style=flat&logo=fastapi&logoColor=white)
+![NiceGUI](https://img.shields.io/badge/NiceGUI-1.4+-orange?style=flat)
+
+- **ML & Data Science**
+
+![Pandas](https://img.shields.io/badge/Pandas-2.0+-150458?style=flat&logo=pandas&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-Optimization-EB4C42?style=flat&logo=xgboost&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
+
+- **Base de données & Backend**
+
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red?style=flat&logo=sqlalchemy&logoColor=white)
+![Azure SQL](https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927?style=flat&logo=microsoft-sql-server&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-Validation-E92063?style=flat&logo=pydantic&logoColor=white)
+
+- **DevOps & Cloud**
+
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?style=flat&logo=docker&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4?style=flat&logo=microsoft-azure&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=flat&logo=github-actions&logoColor=white)
+
+- **Monitoring**
+
+![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=flat&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-Dashboard-F46800?style=flat&logo=grafana&logoColor=white)
+
+- **Tests & Qualité**
+
+![Pytest](https://img.shields.io/badge/Pytest-Tests-0A9EDC?style=flat&logo=pytest&logoColor=white)
+![MkDocs](https://img.shields.io/badge/MkDocs-Documentation-526CFE?style=flat&logo=material-for-mkdocs&logoColor=white)
 
 ## A propos
 
