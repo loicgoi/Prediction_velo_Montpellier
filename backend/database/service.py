@@ -296,8 +296,16 @@ class DatabaseService:
         weekly_totals = [0] * 12
         for r in rows_12w:
             # Calculate the relative week number (0 to 11)
-            # 0 = oldest week, 11 = current week
+            # 0 = oldest week (about 3 months ago)
+            # 11 = current week
             days_diff = (r.date.date() - start_12w).days
             week_idx = days_diff // 7
             if 0 <= week_idx < 12:
                 weekly_totals[week_idx] += r.intensity
+
+        return {
+            "history_30_days": history_30_days,
+            "accuracy_7_days": {"real": acc_real, "pred": acc_pred},
+            "weekly_averages": weekly_averages,
+            "weekly_totals": weekly_totals,
+        }
