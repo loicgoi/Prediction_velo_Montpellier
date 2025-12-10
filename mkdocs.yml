@@ -1,0 +1,51 @@
+site_name: Prévision Vélo Montpellier
+site_url: https://github.com/loicgoi/Prediction_velo_Montpellier.git
+site_author: Loïc, Saleh, Gaëtan
+site_description: Documentation technique du pipeline de prédiction de trafic cyclable.
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: teal
+    accent: cyan
+  features:
+    - navigation.tabs # Onglets en haut
+    - navigation.sections # Groupes dans le menu latéral
+    - content.code.copy # Bouton copier sur les blocs de code
+    - search.suggest # Barre de recherche intelligente
+
+# Les plugins indispensables
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [backend]
+
+nav:
+  - Accueil: index.md
+  - Architecture: architecture.md
+  - Pipelines ETL:
+      - Vue d'ensemble: pipelines/overview.md
+      - Collecte (Extract): pipelines/extract.md
+      - Base de Données (Load): pipelines/load.md
+      - Réentrainement: pipelines/retraining.md
+  - Machine Learning:
+      - Préparation (Transform): ml/features.md
+      - Logique Prédiction J0: ml/logic_predict_daily.md
+      - Modélisation: ml/modeling.md
+      - Monitoring: ml/monitoring.md
+  - Interface: interface/frontend_overview.md
+
+# --- AJOUT : Extensions Markdown pour Mermaid ---
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format

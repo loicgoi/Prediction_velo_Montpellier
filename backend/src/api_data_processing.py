@@ -1,0 +1,173 @@
+import pandas as pd
+from download.trafic_history_api import EcoCounterTimeseriesLoader
+from utils.paths import ARCHIVE_PATH
+from typing import List, Dict, Tuple
+from typing import Any
+
+
+def extract_station_metadata(data: List[Dict]) -> Tuple[pd.DataFrame, List[str]]:
+    """
+    Extract station metadata (IDs, latitude, longitude) from raw JSON data
+    and save to CSV.
+
+    Args:
+        data (List[Dict]): JSON data from EncountersIDsLoader.
+
+    Returns:
+        Tuple[pd.DataFrame, List[str]]: A tuple containing the metadata DataFrame and a list of station IDs.
+    """
+    print("Extracting station metadata...")
+    stations_list = []
+    for item in data:
+        if "id" not in item:
+            continue
+        station_data = {
+            "station_id": item["id"],
+            "name": None,
+            "latitude": None,
+            "longitude": None,
+        }
+        try:
+            if (
+                "location" in item
+                and "value" in item["location"]
+                and "coordinates" in item["location"]["value"]
+            ):
+                coords = item["location"]["value"]["coordinates"]
+                station_data["latitude"] = coords[0]
+                station_data["longitude"] = coords[1]
+        except Exception:
+            pass
+        stations_list.append(station_data)
+
+    df = pd.DataFrame(stations_list)
+    output_path = ARCHIVE_PATH / "stations_metadata.csv"
+    df.to_csv(output_path, index=False)
+    print(f"Station metadata saved into: {output_path}")
+    print("Sample of station metadata:")
+    print(df.head())
+    return df, df["station_id"].tolist()
+
+
+def fetch_and_extract_timeseries(
+    ids_list: List[str], start_date: str = "2022-12-24", end_date: str = "2025-12-04"
+) -> pd.DataFrame:
+    """
+    Fetch timeseries data for each station ID and save to CSV.
+
+    Args:
+        ids_list (List[str]): List of station IDs.
+        start_date (str): Start date of the timeseries.
+        end_date (str): End date of the timeseries.
+
+    Returns:
+        pd.DataFrame: DataFrame containing all stations' timeseries data.
+    """
+    print("Fetching timeseries data for stations...")
+    timeseries_loader = EcoCounterTimeseriesLoader()
+    responses_dict = timeseries_loader.fetch_data(
+        station_ids_list=ids_list,
+        start_date=start_date,
+        end_date=end_date,
+        timeout=5,
+        retries=3,
+    )
+
+    all_records = []
+    for station_id, data in responses_dict.items():
+        if not data or "index" not in data or "values" not in data:
+            continue
+        for d, v in zip(data["index"], data["values"]):
+            all_records.append({"station_id": station_id, "date": d, "intensity": v})
+
+    df_timeseries = pd.DataFrame(all_records)
+    output_path = ARCHIVE_PATH / "trafic_history.csv"
+    df_timeseries.to_csv(output_path, index=False)
+    print(f"Timeseries data saved into: {output_path}")
+    print("Sample of timeseries data:")
+    print(df_timeseries.head())
+    return df_timeseries
+
+
+def extract_weather_fields(
+    json_data: Dict, filename: str = "weather_history.csv"
+) -> pd.DataFrame:
+    """
+    Extract required weather fields from JSON and save into CSV.
+
+    Args:
+        json_data (Dict): Raw JSON data from WeatherHistoryLoader.
+        filename (str): Name of the output CSV file.
+
+    Returns:
+        pd.DataFrame: DataFrame containing weather data.
+    """
+    if json_data is None:
+        raise ValueError("json_data is None.")
+
+    print("Extracting weather data...")
+    daily = json_data.get("daily", {})
+
+    dates = daily.get("time")
+    avg_temp = daily.get("temperature_2m_mean")
+    precipitation = daily.get("precipitation_sum")
+    max_vent = daily.get("wind_speed_10m_max")
+
+    if not (dates and avg_temp and precipitation and max_vent):
+        raise ValueError("Missing required weather fields.")
+
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "avg_temp": avg_temp,
+            "precipitation_mm": precipitation,
+            "vent_max": max_vent,
+        }
+    )
+
+    output = ARCHIVE_PATH / filename
+    df.to_csv(output, index=False)
+    print(f"Weather data saved into: {output}")
+    print("Sample of weather data:")
+    print(df.head())
+    return df
+
+
+def extract_daily_weather(response_json: Any) -> pd.DataFrame:
+    """
+    Convert the JSON response from Open-Meteo API into a Pandas DataFrame.
+
+    Args:
+        response_json (Any): The JSON-like object returned by Open-Meteo API.
+
+    Returns:
+        pd.DataFrame: DataFrame with columns:
+            - date
+            - avg_temp
+            - vent_max
+            - precipitation_mm
+    """
+    # Take first location
+    response = response_json[0]
+
+    # Daily data
+    daily = response.Daily()
+    daily_temperature_2m_mean = daily.Variables(0).ValuesAsNumpy()
+    daily_wind_speed_10m_mean = daily.Variables(1).ValuesAsNumpy()
+    daily_precipitation_sum = daily.Variables(2).ValuesAsNumpy()
+
+    daily_data = {
+        "date": pd.date_range(
+            start=pd.to_datetime(daily.Time(), unit="s", utc=True),
+            end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
+            freq=pd.Timedelta(seconds=daily.Interval()),
+            inclusive="left",
+        )
+    }
+
+    daily_data["avg_temp"] = daily_temperature_2m_mean
+    daily_data["vent_max"] = daily_wind_speed_10m_mean
+    daily_data["precipitation_mm"] = daily_precipitation_sum
+
+    daily_dataframe = pd.DataFrame(data=daily_data)
+    return daily_dataframe
