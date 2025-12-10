@@ -54,68 +54,68 @@ Le projet est divisé en deux blocs principaux conteneurisés via Docker :
 backend/
 ├── api/                            # Couche d'exposition (API REST)
 │   ├── api.py                      # Point d'entree de l'application FastAPI
-│   ├── endpoints.py                # Definition des routes (GET /predict, etc.)
+│   ├── endpoints.py                # Définition des routes (GET /predict, etc.)
 │   └── server.py                   # Configuration du serveur Uvicorn/Gunicorn
 ├── core/                           # Configuration coeur
 │   ├── dependencies.py             # Gestion des instances (Singleton BDD)
-│   └── training.py                 # Constantes liees a l'entrainement
+│   └── training.py                 # Constantes liées a l'entraînement
 ├── data/                           # Stockage local (Volume Docker)
 │   ├── raw/                        # Fichiers CSV bruts temporaires
 │   ├── models/                     # Artefacts ML (fichiers .pkl)
-│   └── output/                     # Exports de donnees traitees
+│   └── output/                     # Exports de données traitées
 ├── database/                       # Couche de stockage
-│   ├── database.py                 # Modeles SQLAlchemy (Tables SQL)
-│   ├── fetch_prediction.py         # Requetes specifiques de lecture
+│   ├── database.py                 # Modèles SQLAlchemy (Tables SQL)
+│   ├── fetch_prediction.py         # Requêtes spécifiques de lecture
 │   └── service.py                  # CRUD complet (Create, Read, Update, Delete)
 ├── download/                       # Connecteurs aux APIs externes (Extract)
-│   ├── abstract_loader.py          # Classe mere abstraite pour les loaders
+│   ├── abstract_loader.py          # Classe mère abstraite pour les loaders
 │   ├── daily_weather_api.py        # Client API OpenMeteo (Previsions J0)
-│   ├── ecocounters_ids.py          # Recuperation de la liste des compteurs
+│   ├── ecocounters_ids.py          # Récuperation de la liste des compteurs
 │   ├── geocoding_service.py        # Service de conversion Adresse <-> GPS
 │   ├── trafic_history_api.py       # Client API EcoCompteur (Historique avec pagination)
 │   └── weeather_api.py             # Client API OpenMeteo (Archive historique)
-├── features/                       # Ingenierie des fonctionnalites (Transform)
-│   ├── features_engineering.py     # Transformation Donnee brute -> Variables ML
+├── features/                       # Ingénierie des fonctionnalités (Transform)
+│   ├── features_engineering.py     # Transformation Données brute -> Variables ML
 │   └── features_vizualization.py   # Outils graphiques pour analyser les features
 ├── modeling/                       # Coeur du Machine Learning
-│   ├── predictor.py                # Moteur d'inference (Charge le modele et predit)
+│   ├── predictor.py                # Moteur d'inférence (Charge le modele et predit)
 │   ├── preprocessor.py             # Transformation (Scaling, Encodage)
-│   └── trainer.py                  # Entrainement (GridSearch, CrossVal, Save)
-├── monitoring/                     # Suivi de la qualite
-│   └── performance.py              # Calcul des metriques (MAE, RMSE) reel vs predit
+│   └── trainer.py                  # Entraînement (GridSearch, CrossVal, Save)
+├── monitoring/                     # Suivi de la qualité
+│   └── performance.py              # Calcul des métriques (MAE, RMSE) reel vs predit
 ├── pipelines/                      # Scripts d'orchestration (Workflows)
 │   ├── daily_predictor.py          # Pipeline journalier : Prediction J0
 │   ├── daily_update.py             # Pipeline journalier : Mise a jour J-1 + Monitoring
-│   ├── data_insertion.py           # Logique d'insertion securisee en BDD
+│   ├── data_insertion.py           # Logique d'insertion securisée en BDD
 │   ├── initialize_project.py       # Script d'installation initiale (Historique complet)
-│   ├── model_training.py           # Pipeline de re-entrainement complet
+│   ├── model_training.py           # Pipeline de ré-entraînement complet
 │   └── pipeline_visualization.py   # Generation de graphes pour le pipeline
 ├── src/                            # Utilitaires de traitement de donnees
-│   ├── api_data_processing.py      # Nettoyage specifique aux retours API
+│   ├── api_data_processing.py      # Nettoyage spécifique aux retours API
 │   ├── data_cleaner.py             # Fonctions de nettoyage (dedoublonnage, types)
-│   ├── data_exploration.py         # Classe pour generer des stats descriptives
+│   ├── data_exploration.py         # Classe pour générer des stats descriptives
 │   └── data_merger.py              # Logique de fusion (Merge Trafic + Meteo)
 ├── tests/                          # Tests unitaires et d'integration
 │   ├── conftest.py                 # Configuration Pytest (Fixtures)
 │   ├── test_api.py                 # Tests des endpoints API
 │   ├── test_data_insertion.py      # Tests des ecritures en BDD
-│   ├── test_database_service.py    # Tests des requetes SQL
-│   └── test_train.py               # Tests du pipeline d'entrainement
+│   ├── test_database_service.py    # Tests des requêtes SQL
+│   └── test_train.py               # Tests du pipeline d'entraînement
 ├── utils/                          # Outils transverses
-│   ├── logging_config.py           # Configuration centralisee des logs
+│   ├── logging_config.py           # Configuration centralisée des logs
 │   ├── paths.py                    # Gestion des chemins absolus
-│   └── weather_utils.py            # Parsing des reponses OpenMeteo
+│   └── weather_utils.py            # Parsing des réponses OpenMeteo
 ├── .dockerignore                   # Fichiers exclus du build Docker
-├── Dockerfile                      # Definition de l'image Backend
-├── main.py                         # Point d'entree CLI (Menu principal)
+├── Dockerfile                      # Définition de l'image Backend
+├── main.py                         # Point d'entrée CLI (Menu principal)
 ├── main_initialize.py              # Raccourci pour l'initialisation
-└── requirements.txt                # Dependances Python
+└── requirements.txt                # Dépendances Python
 frontend/
-├── app.py                          # Point d'entree de l'application Web
-├── components.py                   # Widgets graphiques reutilisables
-├── data.py                         # Connecteur pour recuperer les donnees du Backend
-├── plots.py                        # Fonctions de generation de graphiques
-├── requirements.txt                # Dependances Frontend
+├── app.py                          # Point d'entrée de l'application Web
+├── components.py                   # Widgets graphiques réutilisables
+├── data.py                         # Connecteur pour récuperer les données du Backend
+├── plots.py                        # Fonctions de génération de graphiques
+├── requirements.txt                # Dépendances Frontend
 ├── .dockerignore
 └── Dockerfile                      # Definition de l'image Frontend
 .gitignore                          # Fichiers exclus de Git
