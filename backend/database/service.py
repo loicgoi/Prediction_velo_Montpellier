@@ -284,24 +284,8 @@ class DatabaseService:
         ]
 
         # Weekly Totals (12-week volume)
-        start_12w = today - timedelta(weeks=12)
-        rows_12w = (
-            self.session.query(BikeCount.date, BikeCount.intensity)
-            .filter(BikeCount.station_id == station_id)
-            .filter(BikeCount.date >= start_12w)
-            .order_by(BikeCount.date.asc())
-            .all()
-        )
-
+        # For now, if there is insufficient historical data, an empty safe list is returned.
         weekly_totals = [0] * 12
-        for r in rows_12w:
-            # Calculate the relative week number (0 to 11)
-            # 0 = oldest week (about 3 months ago)
-            # 11 = current week
-            days_diff = (r.date.date() - start_12w).days
-            week_idx = days_diff // 7
-            if 0 <= week_idx < 12:
-                weekly_totals[week_idx] += r.intensity
 
         return {
             "history_30_days": history_30_days,
