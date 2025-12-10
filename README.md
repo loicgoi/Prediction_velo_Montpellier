@@ -89,7 +89,6 @@ backend/
 │   ├── data_insertion.py           # Logique d'insertion securisee en BDD
 │   ├── initialize_project.py       # Script d'installation initiale (Historique complet)
 │   ├── model_training.py           # Pipeline de re-entrainement complet
-│   ├── pipeline.py                 # Menu interactif (CLI)
 │   └── pipeline_visualization.py   # Generation de graphes pour le pipeline
 ├── src/                            # Utilitaires de traitement de donnees
 │   ├── api_data_processing.py      # Nettoyage specifique aux retours API
@@ -122,7 +121,6 @@ frontend/
 .gitignore                          # Fichiers exclus de Git
 README.md                           # Documentation du projet
 docker-compose.yml                  # Orchestration des conteneurs
-logique_predict_daily.md            # Doc specifique sur la logique J0
 prometheus.yml                      # Configuration monitoring infrastructure
 reset_db.py                         # Script utilitaire pour vider la base
 ```
