@@ -182,7 +182,7 @@ Les performances du modèle sont stockées quotidiennement dans la table model_m
     - Git
     - Docker Desktop
 
-2. Configuration des variables d'environnement
+2. **Configuration des variables d'environnement**
    - Créer un .env
    - Rajouter les informations suivantes
 
@@ -203,18 +203,20 @@ WEBSITES_PORT=8000
 docker compose up --build -d
 ```
 
-4. ** Initialisation du projet (premier lancement)
+4. **Initialisation du projet (premier lancement)**
 
 ```
 docker compose exec backend main_initialize.py
+
 ```
 
 *Le script lance* :
-    - La création de votre base de données.
-    - Le téléchargement de l'historique du trafic cyclable depuis 2023.
-    - La récupération des données météo depuis 2023.
-    - Le traitement des données (nettoyage, preprocessing)
-    - L'entraînement premier du modèle (XGBoost)
+
+- La création de votre base de données.
+- Le téléchargement de l'historique du trafic cyclable depuis 2023.
+- La récupération des données météo depuis 2023.
+- Le traitement des données (nettoyage, preprocessing)
+- L'entraînement premier du modèle (XGBoost)
 
 5. **Accéder aux services**
 
@@ -225,7 +227,7 @@ docker compose exec backend main_initialize.py
 | **Prometheus** | [http://localhost:9090](http://localhost:9090) | Collecte des métriques | - |
 | **Grafana** | [http://localhost:3000](http://localhost:3000) | Dashboard de monitoring technique | `admin` / `admin` |
 
-6. Arrêt de l'application
+6. **Arrêt de l'application**
 
 ```
 docker compose down
